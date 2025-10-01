@@ -1,0 +1,121 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="TEN Connect/Introduction" />
+
+# TEN Connect React Components
+
+Welcome to TEN Connect - a comprehensive React component library for integrating with TEN Protocol's privacy-preserving blockchain network.
+
+## What is TEN Protocol?
+
+TEN Protocol is a privacy-focused Ethereum Layer 2 solution that enables confidential smart contracts. Unlike traditional blockchains where all transaction data is public, TEN Protocol ensures that:
+
+- **Transaction Details are Private** - Only the parties involved can see transaction amounts and data
+- **Smart Contract State is Confidential** - Contract state is encrypted and only accessible to authorized parties  
+- **Front-running Protection** - MEV attacks are prevented through encrypted mempools
+- **Regulatory Compliance** - Built-in privacy controls for enterprise adoption
+
+## What is TEN Connect?
+
+TEN Connect is a React component library that makes it easy to build dApps on TEN Protocol. It provides:
+
+### **Wallet Connection**
+- Seamless wallet connection with automatic TEN network detection
+- Built-in network switching and configuration
+- Support for multiple wallet types
+
+### **Session Key Management**
+- Privacy-preserving session keys for gasless transactions
+- Automatic session key funding and management
+- Secure session key deletion with fund recovery
+
+### **Easy Integration**
+- Drop-in React components that work out of the box
+- Comprehensive TypeScript support
+- Zustand-based state management
+- Storybook documentation and examples
+
+### **Customizable UI**
+- Beautiful default styling with Tailwind CSS
+- Fully customizable components
+- Dark/light theme support
+- Mobile-responsive design
+
+## Key Components
+
+### `WagmiWrapper`
+The main provider component that sets up wagmi and React Query for TEN Protocol.
+
+### `ConnectWalletWrapper` 
+A wrapper that shows your dApp content only when users are connected to TEN Protocol.
+
+### `ConnectWalletButton`
+A smart wallet connection button with built-in network detection and switching.
+
+### `SessionKeyManager`
+Complete session key management interface with funding, withdrawal, and deletion capabilities.
+
+### `useSessionKey` Hook
+A powerful hook for programmatic session key operations and state management.
+
+## Getting Started
+
+```bash
+npm install @ten-protocol/connect-react
+```
+
+```tsx
+import { 
+  WagmiWrapper, 
+  ConnectWalletWrapper, 
+  ConnectWalletButton,
+  SessionKeyManager 
+} from '@ten-protocol/connect-react';
+
+function App() {
+  return (
+    <WagmiWrapper>
+      <ConnectWalletWrapper loading={false}>
+        <header>
+          <h1>My Private dApp</h1>
+          <div>
+            <SessionKeyManager />
+            <ConnectWalletButton />
+          </div>
+        </header>
+        <main>
+          {/* Your dApp content */}
+        </main>
+      </ConnectWalletWrapper>
+    </WagmiWrapper>
+  );
+}
+```
+
+## Story Organization
+
+This Storybook is organized into several sections:
+
+- **Complete Demo** - Full dApp integration examples
+- **Individual Components** - Isolated component demonstrations  
+- **SessionKeyManager Demo** - Interactive session key management
+- **Integration Examples** - Real-world usage patterns
+- **Component Library** - Individual UI component documentation
+
+## Privacy Benefits
+
+By using TEN Connect in your dApp, your users get:
+
+- **Private Balances** - Account balances are not publicly visible
+- **Confidential Transactions** - Transaction amounts and recipients are encrypted
+- **Protected Trading** - No front-running or MEV attacks
+- **Secure Data** - Smart contract state is confidential
+- **Gasless Transactions** - Session keys enable smooth UX without constant wallet prompts
+
+## Learn More
+
+- [TEN Protocol Documentation](https://docs.ten.xyz)
+- [GitHub Repository](https://github.com/ten-protocol/connect-react)
+- [TEN Protocol Website](https://ten.xyz)
+
+Start exploring the components in the sidebar to see TEN Connect in action! 🚀
