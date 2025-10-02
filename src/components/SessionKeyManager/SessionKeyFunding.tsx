@@ -120,7 +120,7 @@ export default function SessionKeyFunding() {
     const handleStartSession = async () => {
         const provider = await connector?.getProvider();
         if (provider) {
-            await startSession(provider, isConnected);
+            await startSession(isConnected);
         }
     };
 
@@ -129,7 +129,7 @@ export default function SessionKeyFunding() {
 
         const provider = await connector?.getProvider();
         if (provider && address) {
-            await fundSession(fundAmount, provider, address, isConnected);
+            await fundSession(fundAmount, address, isConnected);
             setFundAmount('');
         }
     };
@@ -139,7 +139,7 @@ export default function SessionKeyFunding() {
 
         const provider = await connector?.getProvider();
         if (provider && address) {
-            await withdrawAmountAction(withdrawAmount, provider, address, isConnected);
+            await withdrawAmountAction(withdrawAmount, address, isConnected);
             setWithdrawAmount('');
         }
     };

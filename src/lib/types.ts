@@ -36,29 +36,18 @@ export interface SessionKeyStore {
     balance: SessionBalanceObject;
     isLoading: boolean;
     error: Error | null;
+    provider: EIP1193Provider | null,
 
     // Actions
-    setSessionKey: (sessionKey: string | null) => void;
-    setIsActive: (isActive: boolean) => void;
-    setBalance: (balance: SessionBalanceObject) => void;
-    setIsLoading: (isLoading: boolean) => void;
-    setError: (error: Error | null) => void;
+    initSession: (provider: EIP1193Provider) => void;
     updateState: (updates: Partial<SessionKeyState>) => void;
     reset: () => void;
-
-    // Session key operations
-    createSessionKey: (provider: EIP1193Provider) => Promise<string>;
-    fundSessionKey: (
-        amount: string,
-        provider: EIP1193Provider,
-        userAddress: string
-    ) => Promise<string>;
-    deleteSessionKey: (provider: EIP1193Provider) => Promise<void>;
-    cleanupSessionKey: (provider: EIP1193Provider) => Promise<void>;
-    updateBalance: (provider: EIP1193Provider) => Promise<SessionBalanceObject>;
-
-    // Transaction operations
-    sendTransaction: (txParams: TransactionParams, provider: EIP1193Provider) => Promise<string>;
+    createSessionKey: () => Promise<string>;
+    fundSessionKey: (amount: string,userAddress: string) => Promise<string>;
+    deleteSessionKey: () => Promise<void>;
+    cleanupSessionKey: () => Promise<void>;
+    updateBalance: () => Promise<SessionBalanceObject>;
+    sendTransaction: (txParams: TransactionParams) => Promise<string>;
 }
 
 export interface TenConfig {

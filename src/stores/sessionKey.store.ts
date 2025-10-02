@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { encode as rlpEncode } from 'rlp';
 
-import type {SessionKeyStore, EIP1193Provider, TransactionParams, SessionBalanceObject} from '@/lib/types';
+import type {SessionKeyStore, TransactionParams, SessionBalanceObject} from '@/lib/types';
 import { LOCAL_STORAGE_KEY, TEN_ADDRESSES } from '@/lib/constants';
 import {
     parseEther,
@@ -27,33 +27,39 @@ const initialState = {
     error: null,
 };
 
-// Track provider event listeners
 const providerCleanupRef = { current: null as (() => void) | null };
 
 export const useSessionKeyStore = create<SessionKeyStore>()(
     persist(
         (set, get) => ({
-            // State
             ...initialState,
 
-            // Basic setters
-            setSessionKey: (sessionKey) => set({ sessionKey }),
-            setIsActive: (isActive) => set({ isActive }),
-            setBalance: (balance) => set({ balance }),
-            setIsLoading: (isLoading) => set({ isLoading }),
-            setError: (error) => set({ error }),
+            provider: null,
 
-            // Update multiple state properties at once
+            initSession: (provider) => {
+                if (provider) {
+                    console.log("Provider for session key set")
+                    set({provider})
+                }
+
+                if (provider && get().sessionKey) {
+                    get().updateBalance();
+                }
+            },
+
             updateState: (updates) => set((state) => ({ ...state, ...updates })),
 
-            // Reset to initial state
             reset: () => set(initialState),
 
-            // Session key operations
-            createSessionKey: async (provider: EIP1193Provider) => {
+            createSessionKey: async () => {
                 try {
                     let sessionKeyAddress = '';
                     set({ isLoading: true, error: null });
+
+                    const provider = get().provider
+                    if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
+
+                    set({provider})
 
                     // Setup provider listeners
                     setupProviderListeners(provider, (updates) => set(updates), providerCleanupRef);
@@ -87,7 +93,7 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     });
 
                     // Update balance after creating session key
-                    await get().updateBalance(provider);
+                    await get().updateBalance();
 
                     return sessionKeyAddress;
                 } catch (error) {
@@ -98,10 +104,11 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            fundSessionKey: async (amount: string, provider: EIP1193Provider, userAddress: string) => {
+            fundSessionKey: async (amount: string, userAddress: string) => {
                 try {
                     set({ isLoading: true, error: null });
                     const sessionKeyAddress = get().sessionKey
+                    const provider = get().provider
 
                     if (!sessionKeyAddress) {throw new Error('Cannot fund session. No session key is available.')}
                     if (!provider) {throw new Error('Cannot fund session. Provider is not available.')}
@@ -160,12 +167,14 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            deleteSessionKey: async (provider: EIP1193Provider) => {
+            deleteSessionKey: async () => {
                 try {
                     set({ isLoading: true, error: null });
                     const sessionKeyAddress = get().sessionKey;
+                    const provider = get().provider
 
                     if (!sessionKeyAddress) {throw new Error('Cannot delete session. No session key is available')}
+                    if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
 
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
@@ -198,9 +207,12 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            cleanupSessionKey: async (provider: EIP1193Provider) => {
+            cleanupSessionKey: async () => {
                 try {
                     set({ isLoading: true, error: null });
+
+                    const provider = get().provider
+                    if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
 
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
@@ -224,8 +236,9 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            updateBalance: async (provider: EIP1193Provider) => {
+            updateBalance: async () => {
                 try {
+                    const provider = get().provider
                     const sessionKeyAddress = get().sessionKey
                     if (!sessionKeyAddress) {throw new Error('Cannot delete session. No session key is available.')}
                     if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
@@ -253,10 +266,12 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            // Transaction operations
-            sendTransaction: async (txParams: TransactionParams, provider: EIP1193Provider) => {
+            sendTransaction: async (txParams: TransactionParams) => {
                 try {
                     set({ isLoading: true, error: null });
+
+                    const provider = get().provider
+                    if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
 
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
@@ -400,12 +415,12 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     throw err;
                 }
             },
+
         }),
         {
             name: 'ten-session-key-state',
             partialize: (state) => ({
-                sessionKey: state.sessionKey,
-                isActive: state.isActive,
+                sessionKey: state.sessionKey
             }),
         }
     )

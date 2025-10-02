@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { formatEther } from 'viem';
+import {formatEther} from 'viem';
 import { useSessionKeyStore } from './sessionKey.store';
+import {EIP1193Provider} from "@/lib/types";
 
 export enum DeletionState {
     IDLE = 'idle',
@@ -12,6 +13,7 @@ export enum DeletionState {
 }
 
 export type SessionKeyManagerStore = {
+    provider: null|EIP1193Provider;
     isRefreshingBalance: boolean;
     balance: number;
     deletionState: DeletionState;
@@ -19,23 +21,21 @@ export type SessionKeyManagerStore = {
     isTransacting: boolean;
 
     // Actions
-    startSession: (provider: any, isConnected: boolean) => Promise<void>;
+    initSession: (connector:any) => Promise<void>;
+    startSession: (isConnected: boolean) => Promise<void>;
     fundSession: (
         fundAmount: string,
-        provider: any,
         address: string,
         isConnected: boolean
     ) => Promise<void>;
     withdrawAmountAction: (
         withdrawAmount: string,
-        provider: any,
         address: string,
         isConnected: boolean
     ) => Promise<void>;
-    confirmDeleteSession: (provider: any, address: string, isConnected: boolean) => Promise<void>;
-    updateSessionKeyBalance: (provider: any) => Promise<void>;
+    confirmDeleteSession: (address: string, isConnected: boolean) => Promise<void>;
+    updateSessionKeyBalance: () => Promise<void>;
     withdrawFromSessionKey: (
-        provider: any,
         recipientAddress: string,
         amount?: string
     ) => Promise<boolean>;
@@ -45,6 +45,7 @@ export type SessionKeyManagerStore = {
 };
 
 export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, get) => ({
+    provider: null,
     isRefreshingBalance: false,
     balance: 0,
     deletionState: DeletionState.IDLE,
@@ -52,21 +53,32 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
     isTransacting: false,
 
     // Session key actions
-    startSession: async (provider, isConnected) => {
+    initSession: async (connector) => {
+        const { initSession} = useSessionKeyStore.getState();
+        const provider = await connector.getProvider();
+
+        if (provider) {
+            console.log("Provider for session key set")
+            set({provider})
+            initSession(provider);
+        }
+    },
+
+    startSession: async (isConnected) => {
         const { createSessionKey, sessionKey, updateState } = useSessionKeyStore.getState();
 
-        if (!provider || !isConnected) {
+        if (!isConnected) {
             alert('Please connect your wallet first');
             return;
         }
 
         try {
-            await createSessionKey(provider);
+            await createSessionKey();
 
             // Update balance after creation and activation
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(provider);
+                    get().updateSessionKeyBalance();
                 }
             }, 2000);
         } catch (error) {
@@ -80,8 +92,9 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    fundSession: async (fundAmount, provider, address, isConnected) => {
+    fundSession: async (fundAmount, address, isConnected) => {
         const { fundSessionKey, sessionKey, updateState } = useSessionKeyStore.getState();
+        const provider = get().provider
 
         if (!provider || !isConnected || !address) {
             alert('Please connect your wallet first');
@@ -102,14 +115,13 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         try {
             await fundSessionKey(
                 fundAmount,
-                provider,
                 address as `0x${string}`
             );
 
             // Update balance after funding and reactivation
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(provider);
+                    get().updateSessionKeyBalance();
                 }
             }, 1000);
         } catch (error) {
@@ -123,8 +135,9 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    withdrawAmountAction: async (withdrawAmount, provider, address, isConnected) => {
+    withdrawAmountAction: async (withdrawAmount,  address, isConnected) => {
         const { sessionKey, updateState } = useSessionKeyStore.getState();
+        const provider = get().provider
 
         if (!provider || !isConnected || !address) {
             alert('Please connect your wallet first');
@@ -143,11 +156,11 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
 
         set({ isTransacting: true });
         try {
-            await get().withdrawFromSessionKey(provider, address, withdrawAmount);
+            await get().withdrawFromSessionKey(address, withdrawAmount);
 
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(provider);
+                    get().updateSessionKeyBalance();
                 }
             }, 2000);
         } catch (error) {
@@ -163,8 +176,9 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    confirmDeleteSession: async (provider, address, isConnected) => {
+    confirmDeleteSession: async (address, isConnected) => {
         const { deleteSessionKey, updateState } = useSessionKeyStore.getState();
+        const provider = get().provider
 
         if (!provider || !isConnected || !address) return;
 
@@ -176,7 +190,7 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
             // Set state to withdrawing
             set({ deletionState: DeletionState.WITHDRAWING });
 
-            const withdrawalSuccess = await get().withdrawFromSessionKey(provider, address);
+            const withdrawalSuccess = await get().withdrawFromSessionKey(address);
 
             if (!withdrawalSuccess) {
                 set({ deletionState: DeletionState.ERROR });
@@ -193,7 +207,7 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
             // Set state to deleting
             set({ deletionState: DeletionState.DELETING });
 
-            await deleteSessionKey(provider);
+            await deleteSessionKey();
             console.log('Session key deleted successfully');
 
             // Set state to completed
@@ -204,13 +218,13 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    updateSessionKeyBalance: async ( provider) => {
+    updateSessionKeyBalance: async () => {
         const { updateBalance, sessionKey, balance } = useSessionKeyStore.getState();
         if (!sessionKey || get().isRefreshingBalance) return;
         set({ isRefreshingBalance: true });
 
         try {
-            const balance = await updateBalance(provider);
+            const balance = await updateBalance();
 
             set({ balance: balance?.eth || 0 });
         } catch (error) {
@@ -220,12 +234,17 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    withdrawFromSessionKey: async (provider, recipientAddress, amount) => {
+    withdrawFromSessionKey: async (recipientAddress, amount) => {
         const { sendTransaction, sessionKey } = useSessionKeyStore.getState();
+        const provider = get().provider
 
         try {
             if (!sessionKey) {
                 throw new Error('No session key available');
+            }
+
+            if (!provider) {
+                throw new Error('No provider available');
             }
 
             const balanceHex = await provider.request({
@@ -265,8 +284,7 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
                 {
                     to: recipientAddress,
                     value: valueHex,
-                },
-                provider
+                }
             );
 
             console.log('Withdrawal transaction submitted:', txHash);

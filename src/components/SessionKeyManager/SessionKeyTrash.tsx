@@ -27,9 +27,8 @@ export default function SessionKeyTrash() {
     };
 
     const handleConfirmDeleteSession = async () => {
-        const provider = await connector?.getProvider();
-        if (provider && address) {
-            await confirmDeleteSession(provider, address, isConnected);
+        if (address) {
+            await confirmDeleteSession(address, isConnected);
         }
         setIsDeleteAlertOpen(false);
     };
