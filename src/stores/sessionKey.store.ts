@@ -116,14 +116,6 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
 
-                    console.log(
-                        '💰 Funding session key:',
-                        sessionKeyAddress,
-                        'with',
-                        amount,
-                        'ETH'
-                    );
-
                     // Convert amount to hex
                     const valueInWei = parseEther(amount);
                     const valueHex = toHex(valueInWei) as `0x${string}`;
@@ -140,7 +132,6 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                         ],
                     });
 
-                    console.log('💰 Funding transaction sent:', txHash);
 
                     // Monitor transaction confirmation
                     const checkTx = async (): Promise<any> => {
@@ -149,7 +140,7 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                             params: [txHash],
                         });
                         if (receipt) {
-                            console.log('💰 Funding confirmed!');
+                            console.log('Funding confirmed!');
                             return receipt;
                         }
                         // Check again in 2 seconds

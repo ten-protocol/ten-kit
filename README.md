@@ -1,4 +1,4 @@
-# @ten-protocol/connect-react
+# @ten-protocol/ten-kit
 
 React components and hooks for connecting dapps to TEN Protocol, featuring wallet connection, session key management, and privacy-preserving transactions.
 
@@ -15,11 +15,11 @@ React components and hooks for connecting dapps to TEN Protocol, featuring walle
 ## Installation
 
 ```bash
-npm install @ten-protocol/connect-react
+npm install @ten-protocol/ten-kit
 # or
-yarn add @ten-protocol/connect-react
+yarn add @ten-protocol/ten-kit
 # or
-pnpm add @ten-protocol/connect-react
+pnpm add @ten-protocol/ten-kit
 ```
 
 ### Peer Dependencies
@@ -47,7 +47,7 @@ pnpm add react react-dom wagmi viem @tanstack/react-query zustand
 Import the required CSS file in your app's entry point (e.g., `_app.tsx`, `main.tsx`, or `index.tsx`):
 
 ```tsx
-import '@ten-protocol/connect-react/dist/styles.css';
+import '@ten-protocol/ten-kit/dist/styles.css';
 ```
 
 This CSS file includes all the necessary styles for the components, including Tailwind utilities and custom component styles.
@@ -57,7 +57,7 @@ This CSS file includes all the necessary styles for the components, including Ta
 ### 1. Wrap your app with TenProvider
 
 ```tsx
-import { TenProvider } from '@ten-protocol/connect-react';
+import { TenProvider } from '@ten-protocol/ten-kit';
 
 function App() {
   return (
@@ -71,7 +71,7 @@ function App() {
 ### 2. Use the ConnectWalletWrapper
 
 ```tsx
-import { ConnectWalletWrapper } from '@ten-protocol/connect-react';
+import { ConnectWalletWrapper } from '@ten-protocol/ten-kit';
 
 function YourDappContent() {
   return (
@@ -90,7 +90,7 @@ function YourDappContent() {
 ### 3. Add a Connect Button
 
 ```tsx
-import { ConnectWalletButton } from '@ten-protocol/connect-react';
+import { ConnectWalletButton } from '@ten-protocol/ten-kit';
 
 function Header() {
   return (
@@ -105,7 +105,7 @@ function Header() {
 ### 4. Use Session Keys for Privacy
 
 ```tsx
-import { useSessionKey } from '@ten-protocol/connect-react';
+import { useSessionKey } from '@ten-protocol/ten-kit';
 import { useConnectorClient } from 'wagmi';
 
 function SessionKeyManager() {
@@ -266,7 +266,7 @@ import {
   TEN_CHAIN_ID,
   DEFAULT_GATEWAY_URL,
   DEFAULT_TEN_CONFIG,
-} from '@ten-protocol/connect-react';
+} from '@ten-protocol/ten-kit';
 ```
 
 ### Utilities
@@ -278,7 +278,7 @@ import {
   parseEther,
   formatEther,
   toHex,
-} from '@ten-protocol/connect-react';
+} from '@ten-protocol/ten-kit';
 ```
 
 ## Styling
@@ -345,7 +345,7 @@ npm run type-check
 ### Custom TEN Configuration
 
 ```tsx
-import { TenProvider } from '@ten-protocol/connect-react';
+import { TenProvider } from '@ten-protocol/ten-kit';
 
 const customConfig = {
   id: 8443,
@@ -380,7 +380,7 @@ function App() {
 ### Error Handling
 
 ```tsx
-import { ConnectWalletWrapper } from '@ten-protocol/connect-react';
+import { ConnectWalletWrapper } from '@ten-protocol/ten-kit';
 import { useState, useEffect } from 'react';
 
 function MyDapp() {

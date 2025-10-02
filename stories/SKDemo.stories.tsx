@@ -76,7 +76,7 @@ export const Default: Story = {
             },
             source: {
                 code: `import React from 'react';
-import { TENProvider, ConnectWalletButton, SessionKeyManager, useSessionKeyStore } from '@ten-protocol/connect-react';
+import { TENProvider, ConnectWalletButton, SessionKeyManager, useSessionKeyStore } from '@ten-protocol/ten-kit';
 import { useAccount } from 'wagmi';
 
 const SessionKeyExample = () => (

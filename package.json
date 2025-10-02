@@ -1,5 +1,5 @@
 {
-  "name": "@tenprotocol/connect-react",
+  "name": "@tenprotocol/ten-kit",
   "version": "1.0.2",
   "type": "module",
   "description": "React components and hooks for connecting dapps to TEN Protocol",
@@ -41,7 +41,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ten-protocol/react-connect.git"
+    "url": "https://github.com/ten-protocol/ten-kit.git"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

@@ -21,8 +21,10 @@ export default function SessionKeyFunding() {
     const [activeTab, setActiveTab] = useState<'fund' | 'withdraw'>('fund');
     const [fundAmount, setFundAmount] = useState<string>('');
     const [withdrawAmount, setWithdrawAmount] = useState<string>('');
+    const [withdrawAddress, setWithdrawAddress] = useState<string>('');
     const [fundError, setFundError] = useState<string>('');
     const [withdrawError, setWithdrawError] = useState<string>('');
+    const [withdrawAddressError, setWithdrawAddressError] = useState<string>('');
 
     // Validation functions
     const validateFundAmount = (amount: string) => {
@@ -81,6 +83,23 @@ export default function SessionKeyFunding() {
         return true;
     };
 
+    const validateWithdrawAddress = (addr: string) => {
+        if (!addr || addr === '') {
+            setWithdrawAddressError('');
+            return true; // Optional field, empty is valid
+        }
+
+        // Basic Ethereum address validation (0x followed by 40 hex characters)
+        const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+        if (!ethAddressRegex.test(addr)) {
+            setWithdrawAddressError('Invalid Ethereum address');
+            return false;
+        }
+
+        setWithdrawAddressError('');
+        return true;
+    };
+
     // Validate amounts when they change
     useEffect(() => {
         validateFundAmount(fundAmount);
@@ -89,6 +108,10 @@ export default function SessionKeyFunding() {
     useEffect(() => {
         validateWithdrawAmount(withdrawAmount);
     }, [withdrawAmount, balance]);
+
+    useEffect(() => {
+        validateWithdrawAddress(withdrawAddress);
+    }, [withdrawAddress]);
 
     // Helper functions for quick transfer buttons
     const getWalletBalance = () => {
@@ -136,11 +159,15 @@ export default function SessionKeyFunding() {
 
     const handleWithdrawAmount = async () => {
         if (!validateWithdrawAmount(withdrawAmount)) return;
+        if (!validateWithdrawAddress(withdrawAddress)) return;
 
         const provider = await connector?.getProvider();
         if (provider && address) {
-            await withdrawAmountAction(withdrawAmount, address, isConnected);
+            // Use custom address if provided, otherwise use connected wallet address
+            const targetAddress = withdrawAddress || address;
+            await withdrawAmountAction(withdrawAmount, targetAddress, isConnected);
             setWithdrawAmount('');
+            setWithdrawAddress('');
         }
     };
 
@@ -186,6 +213,7 @@ export default function SessionKeyFunding() {
                 <div className="space-y-2">
                     <Label htmlFor="fundAmount">Fund Session</Label>
                     <div className="grid grid-cols-4 gap-4">
+                        <div className="flex-1 col-span-3">
                         <Input
                             id="fundAmount"
                             type="number"
@@ -194,9 +222,49 @@ export default function SessionKeyFunding() {
                             value={fundAmount}
                             onChange={(e) => setFundAmount(e.target.value)}
                             placeholder="0.01"
-                            className="flex-1 col-span-3"
+                            className="mb-2"
                             disabled={isTransacting}
                         />
+                            {/* Quick transfer buttons */}
+                            <div className="flex gap-1">
+                                <Button
+                                    onClick={() => setFundAmountPercentage(25)}
+                                    disabled={isTransacting || getWalletBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    25%
+                                </Button>
+                                <Button
+                                    onClick={() => setFundAmountPercentage(50)}
+                                    disabled={isTransacting || getWalletBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    50%
+                                </Button>
+                                <Button
+                                    onClick={() => setFundAmountPercentage(75)}
+                                    disabled={isTransacting || getWalletBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    75%
+                                </Button>
+                                <Button
+                                    onClick={() => setFundAmountPercentage(100)}
+                                    disabled={isTransacting || getWalletBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    100%
+                                </Button>
+                            </div>
+                        </div>
                         <Button
                             onClick={handleFundSession}
                             disabled={isTransacting || !fundAmount || !!fundError}
@@ -210,45 +278,7 @@ export default function SessionKeyFunding() {
                             )}
                         </Button>
                     </div>
-                    {/* Quick transfer buttons */}
-                    <div className="flex gap-1">
-                        <Button
-                            onClick={() => setFundAmountPercentage(25)}
-                            disabled={isTransacting || getWalletBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            25%
-                        </Button>
-                        <Button
-                            onClick={() => setFundAmountPercentage(50)}
-                            disabled={isTransacting || getWalletBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            50%
-                        </Button>
-                        <Button
-                            onClick={() => setFundAmountPercentage(75)}
-                            disabled={isTransacting || getWalletBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            75%
-                        </Button>
-                        <Button
-                            onClick={() => setFundAmountPercentage(100)}
-                            disabled={isTransacting || getWalletBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            100%
-                        </Button>
-                    </div>
+
                     {fundError && <p className="text-xs text-red-400 absolute">{fundError}</p>}
                 </div>
             )}
@@ -256,7 +286,22 @@ export default function SessionKeyFunding() {
             {activeTab === 'withdraw' && (
                 <div className="space-y-2">
                     <Label htmlFor="withdrawAmount">Withdraw From Session</Label>
+                    <div className="space-y-2">
+                        <Input
+                            id="withdrawAddress"
+                            type="text"
+                            value={withdrawAddress}
+                            onChange={(e) => setWithdrawAddress(e.target.value)}
+                            placeholder="Recipient address (optional, defaults to your wallet)"
+                            className="w-full"
+                            disabled={isTransacting}
+                        />
+                        {withdrawAddressError && (
+                            <p className="text-xs text-red-400">{withdrawAddressError}</p>
+                        )}
+                    </div>
                     <div className="grid grid-cols-4 gap-4">
+                        <div className="flex-1 col-span-3">
                         <Input
                             id="withdrawAmount"
                             type="number"
@@ -265,12 +310,57 @@ export default function SessionKeyFunding() {
                             value={withdrawAmount}
                             onChange={(e) => setWithdrawAmount(e.target.value)}
                             placeholder="0.01"
-                            className="flex-1 col-span-3"
+                            className="mb-2"
                             disabled={isTransacting}
                         />
+                            {/* Quick transfer buttons */}
+                            <div className="flex gap-1">
+                                <Button
+                                    onClick={() => setWithdrawAmountPercentage(25)}
+                                    disabled={isTransacting || getSessionKeyBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    25%
+                                </Button>
+                                <Button
+                                    onClick={() => setWithdrawAmountPercentage(50)}
+                                    disabled={isTransacting || getSessionKeyBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    50%
+                                </Button>
+                                <Button
+                                    onClick={() => setWithdrawAmountPercentage(75)}
+                                    disabled={isTransacting || getSessionKeyBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    75%
+                                </Button>
+                                <Button
+                                    onClick={() => setWithdrawAmountPercentage(100)}
+                                    disabled={isTransacting || getSessionKeyBalance() === 0}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                >
+                                    100%
+                                </Button>
+                            </div>
+                        </div>
                         <Button
                             onClick={handleWithdrawAmount}
-                            disabled={isTransacting || !withdrawAmount || !!withdrawError}
+                            disabled={
+                                isTransacting ||
+                                !withdrawAmount ||
+                                !!withdrawError ||
+                                !!withdrawAddressError
+                            }
                             variant="secondary"
                             className="col-span-1"
                         >
@@ -279,45 +369,6 @@ export default function SessionKeyFunding() {
                             ) : (
                                 'Withdraw'
                             )}
-                        </Button>
-                    </div>
-                    {/* Quick transfer buttons */}
-                    <div className="flex gap-1">
-                        <Button
-                            onClick={() => setWithdrawAmountPercentage(25)}
-                            disabled={isTransacting || getSessionKeyBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            25%
-                        </Button>
-                        <Button
-                            onClick={() => setWithdrawAmountPercentage(50)}
-                            disabled={isTransacting || getSessionKeyBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            50%
-                        </Button>
-                        <Button
-                            onClick={() => setWithdrawAmountPercentage(75)}
-                            disabled={isTransacting || getSessionKeyBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            75%
-                        </Button>
-                        <Button
-                            onClick={() => setWithdrawAmountPercentage(100)}
-                            disabled={isTransacting || getSessionKeyBalance() === 0}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                        >
-                            100%
                         </Button>
                     </div>
                     {withdrawError && (
