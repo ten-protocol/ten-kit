@@ -28,7 +28,7 @@ export default function SessionKeyInfo() {
             if (sk) {
                 const provider = await connector?.getProvider();
                 if (provider) {
-                    updateSessionKeyBalance(sk, provider);
+                    updateSessionKeyBalance(provider);
                 }
             }
         }, 5000);
@@ -42,7 +42,7 @@ export default function SessionKeyInfo() {
         if (!sessionKey) return;
         const provider = await connector?.getProvider();
         if (provider) {
-            await updateSessionKeyBalance(sessionKey, provider);
+            await updateSessionKeyBalance(provider);
         }
     };
 

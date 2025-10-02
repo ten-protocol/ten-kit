@@ -1,13 +1,15 @@
 export interface SessionKeyState {
     sessionKey: string | null;
     isActive: boolean;
-    balance: {
-        eth: number;
-        estimatedTransactions: number;
-    } | null;
+    balance: SessionBalanceObject;
     isLoading: boolean;
     error: Error | null;
 }
+
+export type SessionBalanceObject = {
+    eth: number;
+    estimatedTransactions: number;
+} | null;
 
 export interface EIP1193Provider {
     request(args: { method: string; params?: any[] }): Promise<any>;
@@ -31,14 +33,14 @@ export interface SessionKeyStore {
     // State
     sessionKey: string | null;
     isActive: boolean;
-    balance: SessionKeyState['balance'];
+    balance: SessionBalanceObject;
     isLoading: boolean;
     error: Error | null;
 
     // Actions
     setSessionKey: (sessionKey: string | null) => void;
     setIsActive: (isActive: boolean) => void;
-    setBalance: (balance: SessionKeyState['balance']) => void;
+    setBalance: (balance: SessionBalanceObject) => void;
     setIsLoading: (isLoading: boolean) => void;
     setError: (error: Error | null) => void;
     updateState: (updates: Partial<SessionKeyState>) => void;
@@ -47,14 +49,13 @@ export interface SessionKeyStore {
     // Session key operations
     createSessionKey: (provider: EIP1193Provider) => Promise<string>;
     fundSessionKey: (
-        sessionKeyAddress: string,
         amount: string,
         provider: EIP1193Provider,
         userAddress: string
     ) => Promise<string>;
     deleteSessionKey: (provider: EIP1193Provider) => Promise<void>;
     cleanupSessionKey: (provider: EIP1193Provider) => Promise<void>;
-    updateBalance: (sessionKeyAddress: string, provider: EIP1193Provider) => Promise<void>;
+    updateBalance: (provider: EIP1193Provider) => Promise<SessionBalanceObject>;
 
     // Transaction operations
     sendTransaction: (txParams: TransactionParams, provider: EIP1193Provider) => Promise<string>;

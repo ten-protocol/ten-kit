@@ -33,7 +33,7 @@ export type SessionKeyManagerStore = {
         isConnected: boolean
     ) => Promise<void>;
     confirmDeleteSession: (provider: any, address: string, isConnected: boolean) => Promise<void>;
-    updateSessionKeyBalance: (sessionKeyAddress: string, provider: any) => Promise<void>;
+    updateSessionKeyBalance: (provider: any) => Promise<void>;
     withdrawFromSessionKey: (
         provider: any,
         recipientAddress: string,
@@ -66,7 +66,7 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
             // Update balance after creation and activation
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(sessionKey, provider);
+                    get().updateSessionKeyBalance(provider);
                 }
             }, 2000);
         } catch (error) {
@@ -101,7 +101,6 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         set({ isTransacting: true });
         try {
             await fundSessionKey(
-                sessionKey as `0x${string}`,
                 fundAmount,
                 provider,
                 address as `0x${string}`
@@ -110,9 +109,9 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
             // Update balance after funding and reactivation
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(sessionKey, provider);
+                    get().updateSessionKeyBalance(provider);
                 }
-            }, 2000);
+            }, 1000);
         } catch (error) {
             console.error('Failed to fund session:', error);
             updateState({
@@ -148,7 +147,7 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
 
             setTimeout(() => {
                 if (sessionKey) {
-                    get().updateSessionKeyBalance(sessionKey, provider);
+                    get().updateSessionKeyBalance(provider);
                 }
             }, 2000);
         } catch (error) {
@@ -205,13 +204,13 @@ export const useSessionKeyManagerStore = create<SessionKeyManagerStore>()((set, 
         }
     },
 
-    updateSessionKeyBalance: async (sessionKeyAddress, provider) => {
+    updateSessionKeyBalance: async ( provider) => {
         const { updateBalance, sessionKey, balance } = useSessionKeyStore.getState();
         if (!sessionKey || get().isRefreshingBalance) return;
         set({ isRefreshingBalance: true });
 
         try {
-            await updateBalance(sessionKeyAddress, provider);
+            const balance = await updateBalance(provider);
 
             set({ balance: balance?.eth || 0 });
         } catch (error) {

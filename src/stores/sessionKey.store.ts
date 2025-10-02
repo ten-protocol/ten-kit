@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { encode as rlpEncode } from 'rlp';
 
-import type { SessionKeyStore, EIP1193Provider, TransactionParams } from '@/lib/types';
+import type {SessionKeyStore, EIP1193Provider, TransactionParams, SessionBalanceObject} from '@/lib/types';
 import { LOCAL_STORAGE_KEY, TEN_ADDRESSES } from '@/lib/constants';
 import {
     parseEther,
@@ -87,7 +87,7 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     });
 
                     // Update balance after creating session key
-                    await get().updateBalance(sessionKeyAddress, provider);
+                    await get().updateBalance(provider);
 
                     return sessionKeyAddress;
                 } catch (error) {
@@ -98,9 +98,13 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            fundSessionKey: async (sessionKeyAddress: string, amount: string, provider: EIP1193Provider, userAddress: string) => {
+            fundSessionKey: async (amount: string, provider: EIP1193Provider, userAddress: string) => {
                 try {
                     set({ isLoading: true, error: null });
+                    const sessionKeyAddress = get().sessionKey
+
+                    if (!sessionKeyAddress) {throw new Error('Cannot fund session. No session key is available.')}
+                    if (!provider) {throw new Error('Cannot fund session. Provider is not available.')}
 
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
@@ -161,6 +165,8 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     set({ isLoading: true, error: null });
                     const sessionKeyAddress = get().sessionKey;
 
+                    if (!sessionKeyAddress) {throw new Error('Cannot delete session. No session key is available')}
+
                     // Check if connected to TEN network
                     await checkTenNetwork(provider);
 
@@ -218,8 +224,12 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
-            updateBalance: async (sessionKeyAddress: string, provider: EIP1193Provider) => {
+            updateBalance: async (provider: EIP1193Provider) => {
                 try {
+                    const sessionKeyAddress = get().sessionKey
+                    if (!sessionKeyAddress) {throw new Error('Cannot delete session. No session key is available.')}
+                    if (!provider) {throw new Error('Cannot delete session. No provider is available.')}
+
                     const balanceHex = await provider.request({
                         method: 'eth_getBalance',
                         params: [sessionKeyAddress, 'pending'],
@@ -229,15 +239,17 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     const ethBalance = formatEther(balanceWei);
 
                     console.log('ETH balance:', balanceWei);
+                    const balance: SessionBalanceObject = {
+                        eth: parseFloat(ethBalance),
+                        estimatedTransactions: 0,
+                    }
 
-                    set({
-                        balance: {
-                            eth: parseFloat(ethBalance),
-                            estimatedTransactions: 0,
-                        },
-                    });
+                    set({balance});
+
+                    return balance
                 } catch (error) {
                     console.warn('Failed to update balance:', error);
+                    return null
                 }
             },
 

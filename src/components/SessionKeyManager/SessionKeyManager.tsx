@@ -26,12 +26,14 @@ export default function SessionKeyManager() {
     const { deletionState, isRefreshingBalance, updateSessionKeyBalance } =
         useSessionKeyManagerStore();
 
-    console.log(balance);
-
     useEffect(() => {
-        if (sessionKey && connector) {
-            updateSessionKeyBalance(sessionKey, connector.provider);
-        }
+       if (sessionKey && connector) {
+           (async () => {
+               const provider = await connector.getProvider()
+               updateSessionKeyBalance(provider);
+           })()
+       }
+
     }, [sessionKey, connector, updateSessionKeyBalance]);
 
     // Handle dialog open/close
