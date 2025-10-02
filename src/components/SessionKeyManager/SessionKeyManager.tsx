@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { Loader2, AlertCircle, Key } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import {
     Dialog,
     DialogContent,
@@ -10,14 +10,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '../ui/dialog';
-import { formatBalance } from '../../lib/utils';
-import { DeletionState, useSessionKeyManagerStore } from '../../stores/sessionKeyManager.store';
+import { formatBalance } from '@/lib/utils';
+import { DeletionState, useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
 import { useState } from 'react';
 import SessionKeyInfo from './SessionKeyInfo';
 import SessionKeyFunding from './SessionKeyFunding';
 import SessionKeyTrash from './SessionKeyTrash';
 import SessionKeyTrashProgress from './SessionKeyTrashProgress';
-import { useSessionKeyStore } from '../../stores/sessionKey.store';
+import { useSessionKeyStore } from '@/stores/sessionKey.store';
 
 export default function SessionKeyManager() {
     const { isConnected, connector } = useAccount();

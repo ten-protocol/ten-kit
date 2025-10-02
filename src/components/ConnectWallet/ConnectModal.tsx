@@ -1,17 +1,17 @@
 
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '../ui/dialog';
+} from '@/components/ui/dialog';
 import { AlertCircle, Loader2, Wallet } from 'lucide-react';
 import { useConnect, useConnectors } from 'wagmi';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ExternalLink } from 'lucide-react';
-import { DEFAULT_GATEWAY_URL } from '../../lib/constants';
+import { DEFAULT_GATEWAY_URL } from '@/lib/constants';
 
 type Props = {
     isOpen: boolean;
@@ -44,7 +44,7 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
                         Before being able to connect to TEN Protocol for the first time, you&#39;ll
                         need to visit the{' '}
                         <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                            <span className="inline-flex gap-1 justify-center items-center text-bold hover:underline text-teal-300 hover:text-white">
+                            <span className="inline-flex gap-1 justify-center items-center text-bold hover:underline">
                                 TEN Gateway <ExternalLink className="w-3 h-3" />
                             </span>
                         </a>{' '}

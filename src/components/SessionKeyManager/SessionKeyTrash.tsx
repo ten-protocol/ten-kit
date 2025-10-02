@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Separator } from '../ui/separator';
-import { useSessionKeyManagerStore } from '../../stores/sessionKeyManager.store';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,8 +13,8 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../ui/alert-dialog';
-import { useSessionKeyStore } from '../../stores/sessionKey.store';
+} from '@/components/ui/alert-dialog';
+import { useSessionKeyStore } from '@/stores/sessionKey.store';
 
 export default function SessionKeyTrash() {
     const { address, isConnected, connector } = useAccount();

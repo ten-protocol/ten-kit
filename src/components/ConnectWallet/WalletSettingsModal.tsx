@@ -1,6 +1,5 @@
-
-import { Button } from '../ui/button';
-import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '../../lib/constants';
+import { Button } from '@/components/ui/button';
+import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '@/lib/constants';
 import { ExternalLink } from 'lucide-react';
 import {
     Dialog,
@@ -8,11 +7,11 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '../ui/dialog';
+} from '@/components/ui/dialog';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAccount, useDisconnect, useSwitchChain, useBalance } from 'wagmi';
-import { Skeleton } from '../ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = {
     isOpen: boolean;

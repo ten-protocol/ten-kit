@@ -76,10 +76,17 @@ export async function calculateGasFees(
         const multiplier = DEFAULT_GAS_SETTINGS.BASE_FEE_MULTIPLIERS[priority];
         const adjustedBaseFee = BigInt(Math.floor(Number(latestBaseFee) * multiplier));
 
-        return {
-            maxFeePerGas: adjustedBaseFee + medianPriorityFee,
-            maxPriorityFeePerGas: medianPriorityFee,
+        // Ensure minimum priority fee to avoid RLP encoding issues
+        const minPriorityFee = 1000000000n; // 1 gwei minimum
+        const finalPriorityFee = medianPriorityFee > 0n ? medianPriorityFee : minPriorityFee;
+        
+        const result = {
+            maxFeePerGas: adjustedBaseFee + finalPriorityFee,
+            maxPriorityFeePerGas: finalPriorityFee,
         };
+        
+        
+        return result;
     } catch (error) {
         console.warn('Failed to calculate gas fees, using defaults:', error);
         // Fallback to reasonable defaults

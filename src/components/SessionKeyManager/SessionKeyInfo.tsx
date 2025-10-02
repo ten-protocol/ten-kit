@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { RefreshCw, Settings, Database, Trash2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { WalletAddress } from '../ui/walletAddress';
-import { formatBalance } from '../../lib/utils';
-import { useSessionKeyManagerStore } from '../../stores/sessionKeyManager.store';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { WalletAddress } from '@/components/ui/walletAddress';
+import { formatBalance } from '@/lib/utils';
+import { useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,8 +13,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { useSessionKeyStore } from '../../stores/sessionKey.store';
+} from '@/components/ui/dropdown-menu';
+import { useSessionKeyStore } from '@/stores/sessionKey.store';
 
 export default function SessionKeyInfo() {
     const { connector, isConnected } = useAccount();

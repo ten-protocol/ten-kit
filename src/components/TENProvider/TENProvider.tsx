@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import { WagmiProvider, createConfig } from 'wagmi';
 import { defineChain, http } from 'viem';
 import { injected, unstable_connector, fallback } from 'wagmi';
 import { sepolia } from 'viem/chains';
-import { DEFAULT_TEN_CONFIG } from '../../lib/constants';
-import type { TenConfig } from '../../lib/types';
+import { DEFAULT_TEN_CONFIG } from '@/lib/constants';
+import type { TenConfig } from '@/lib/types';
 
 const defaultQueryClient = new QueryClient();
 
@@ -16,7 +16,7 @@ export interface TenProviderProps {
     enableSepolia?: boolean;
 }
 
-export default function WagmiWrapper({ 
+export function TENProvider({
     children, 
     config = DEFAULT_TEN_CONFIG,
     queryClient = defaultQueryClient,

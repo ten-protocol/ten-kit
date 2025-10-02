@@ -2,21 +2,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { encode as rlpEncode } from 'rlp';
 
-import type { SessionKeyStore, EIP1193Provider, TransactionParams } from '../lib/types';
-import { LOCAL_STORAGE_KEY, TEN_ADDRESSES } from '../lib/constants';
+import type { SessionKeyStore, EIP1193Provider, TransactionParams } from '@/lib/types';
+import { LOCAL_STORAGE_KEY, TEN_ADDRESSES } from '@/lib/constants';
 import {
     parseEther,
     toHex,
     formatEther,
     hexToBytes,
-} from '../lib/encoding';
+} from '@/lib/encoding';
 import {
     getLatestBlockNumber,
     toRlpHex,
     checkTenNetwork,
     calculateGasFees,
     setupProviderListeners,
-} from '../lib/helpers';
+} from '@/lib/helpers';
 
 // Initial state
 const initialState = {
@@ -287,7 +287,6 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     let maxFeePerGas: bigint;
                     let maxPriorityFeePerGas: bigint;
 
-                    console.log('', txParams);
 
                     if (txParams.maxFeePerGas && txParams.maxPriorityFeePerGas) {
                         maxFeePerGas = BigInt(txParams.maxFeePerGas);

@@ -1,10 +1,9 @@
-
 import { ReactNode } from 'react';
 import { useAccount } from 'wagmi';
-import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '../../lib/constants';
+import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '@/lib/constants';
 import ConnectWalletButton from './ConnectWalletButton';
-import { Button } from '../ui/button';
-import { cn } from '../../lib/utils';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
 
 interface ConnectWalletProps {

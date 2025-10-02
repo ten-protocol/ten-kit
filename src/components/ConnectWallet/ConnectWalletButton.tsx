@@ -1,5 +1,5 @@
-import { Button } from '../ui/button';
-import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '../../lib/constants';
+import { Button } from '@/components/ui/button';
+import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '@/lib/constants';
 import { ExternalLink } from 'lucide-react';
 import { useAccount, useBalance } from 'wagmi';
 import { useEffect, useState } from 'react';

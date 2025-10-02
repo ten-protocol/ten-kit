@@ -1,4 +1,4 @@
-import { useSessionKeyStore } from '../stores/sessionKey.store';
+import { useSessionKeyStore } from '@/stores/sessionKey.store';
 
 export const useSessionKey = () => {
     const store = useSessionKeyStore();

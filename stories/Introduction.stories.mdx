@@ -43,7 +43,7 @@ TEN Connect is a React component library that makes it easy to build dApps on TE
 
 ## Key Components
 
-### `WagmiWrapper`
+### `TENProvider`
 The main provider component that sets up wagmi and React Query for TEN Protocol.
 
 ### `ConnectWalletWrapper` 
@@ -66,7 +66,7 @@ npm install @ten-protocol/connect-react
 
 ```tsx
 import { 
-  WagmiWrapper, 
+  TENProvider,
   ConnectWalletWrapper, 
   ConnectWalletButton,
   SessionKeyManager 
@@ -74,7 +74,7 @@ import {
 
 function App() {
   return (
-    <WagmiWrapper>
+    <TENProvider>
       <ConnectWalletWrapper loading={false}>
         <header>
           <h1>My Private dApp</h1>
@@ -87,7 +87,7 @@ function App() {
           {/* Your dApp content */}
         </main>
       </ConnectWalletWrapper>
-    </WagmiWrapper>
+    </TENProvider>
   );
 }
 ```

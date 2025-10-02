@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { useSessionKeyManagerStore } from '../../stores/sessionKeyManager.store';
-import { useSessionKeyStore } from '../../stores/sessionKey.store';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
+import { useSessionKeyStore } from '@/stores/sessionKey.store';
 
 export default function SessionKeyFunding() {
     const { address, isConnected, connector } = useAccount();

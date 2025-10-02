@@ -1,6 +1,6 @@
-import { useSessionKeyManagerStore, DeletionState } from '../../stores/sessionKeyManager.store';
-import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
+import { useSessionKeyManagerStore, DeletionState } from '@/stores/sessionKeyManager.store';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
 export default function SessionKeyTrashProgress() {
     const { deletionState, resetDeletionState } = useSessionKeyManagerStore();

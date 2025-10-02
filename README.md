@@ -27,8 +27,30 @@ pnpm add @ten-protocol/connect-react
 Make sure you have the required peer dependencies installed:
 
 ```bash
-npm install react react-dom
+npm install react react-dom wagmi viem @tanstack/react-query zustand
+# or
+yarn add react react-dom wagmi viem @tanstack/react-query zustand
+# or
+pnpm add react react-dom wagmi viem @tanstack/react-query zustand
 ```
+
+**Required versions:**
+- `react` >= 16.8.0
+- `react-dom` >= 16.8.0
+- `wagmi` ^2.0.0
+- `viem` ^2.0.0
+- `@tanstack/react-query` ^5.0.0
+- `zustand` ^4.4.0
+
+### CSS Import
+
+Import the required CSS file in your app's entry point (e.g., `_app.tsx`, `main.tsx`, or `index.tsx`):
+
+```tsx
+import '@ten-protocol/connect-react/dist/styles.css';
+```
+
+This CSS file includes all the necessary styles for the components, including Tailwind utilities and custom component styles.
 
 ## Quick Start
 
@@ -39,9 +61,9 @@ import { TenProvider } from '@ten-protocol/connect-react';
 
 function App() {
   return (
-    <TenProvider>
+    <TENProvider>
       <YourDappContent />
-    </TenProvider>
+    </TENProvider>
   );
 }
 ```
@@ -53,12 +75,14 @@ import { ConnectWalletWrapper } from '@ten-protocol/connect-react';
 
 function YourDappContent() {
   return (
-    <ConnectWalletWrapper loading={false}>
-      <div>
-        <h1>Your dApp Content</h1>
-        <p>This content is only visible when connected to TEN Protocol</p>
-      </div>
-    </ConnectWalletWrapper>
+      <TENProvider>
+        <ConnectWalletWrapper loading={false}>
+          <div>
+            <h1>Your dApp Content</h1>
+            <p>This content is only visible when connected to TEN Protocol</p>
+          </div>
+        </ConnectWalletWrapper>
+      </TENProvider>
   );
 }
 ```
@@ -380,54 +404,6 @@ function MyDapp() {
     >
       <YourDappContent />
     </ConnectWalletWrapper>
-  );
-}
-```
-
-### Advanced Session Key Usage
-
-```tsx
-import { useSessionKey, useSessionKeyStore } from '@ten-protocol/connect-react';
-import { useConnectorClient, useAccount } from 'wagmi';
-
-function AdvancedSessionKeyManager() {
-  const { address } = useAccount();
-  const { data: client } = useConnectorClient();
-  const sessionKeyStore = useSessionKeyStore();
-  const {
-    sessionKey,
-    balance,
-    error,
-    createSessionKey,
-    fundSessionKey,
-    sendTransaction,
-  } = useSessionKey();
-
-  // Direct store access for advanced usage
-  const handleDirectStoreUpdate = () => {
-    sessionKeyStore.setError(null);
-    sessionKeyStore.setIsLoading(true);
-    // ... custom logic
-  };
-
-  // Batch transactions
-  const handleBatchTransactions = async () => {
-    if (!client || !sessionKey) return;
-
-    const transactions = [
-      { to: '0x...', data: '0x...', value: '0x0' },
-      { to: '0x...', data: '0x...', value: '0x0' },
-    ];
-
-    for (const tx of transactions) {
-      await sendTransaction(tx, client.provider);
-    }
-  };
-
-  return (
-    <div>
-      {/* Your advanced UI */}
-    </div>
   );
 }
 ```

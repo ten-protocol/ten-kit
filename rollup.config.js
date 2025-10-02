@@ -69,7 +69,7 @@ export default [
       // Show all other warnings (from our source code)
       warn(warning);
     },
-    external: ['react', 'react-dom'],
+    external: ['react', 'react-dom', 'react/jsx-runtime', 'wagmi', 'viem', '@tanstack/react-query', '@tanstack/query-core', 'zustand'],
   },
   {
     input: 'dist/index.d.ts',
@@ -77,7 +77,7 @@ export default [
     plugins: [
       alias({
         entries: [
-          { find: '@', replacement: path.resolve(__dirname, 'src') }
+          { find: '@', replacement: path.resolve(__dirname, 'dist') }
         ]
       }),
       dts()

@@ -1,26 +1,29 @@
+// Import styles
+import './styles/globals.css';
+
 // Main Provider
-export { default as WagmiWrapper } from './components/WagmiWrapper/WagmiWrapper';
-export type { TenProviderProps } from './components/WagmiWrapper/WagmiWrapper';
+export { TENProvider } from '@/components/TENProvider/TENProvider';
+export type { TenProviderProps } from '@/components/TENProvider/TENProvider';
 
 // Connect Wallet Components
-export { default as ConnectWalletButton } from './components/ConnectWallet/ConnectWalletButton';
-export { default as ConnectWalletWrapper } from './components/ConnectWallet/ConnectWalletWrapper';
-export { default as ConnectModal } from './components/ConnectWallet/ConnectModal';
-export { default as WalletSettingsModal } from './components/ConnectWallet/WalletSettingsModal';
+export { default as ConnectWalletButton } from '@/components/ConnectWallet/ConnectWalletButton';
+export { default as ConnectWalletWrapper } from '@/components/ConnectWallet/ConnectWalletWrapper';
+export { default as ConnectModal } from '@/components/ConnectWallet/ConnectModal';
+export { default as WalletSettingsModal } from '@/components/ConnectWallet/WalletSettingsModal';
 
 // Session Key Manager Components
-export { default as SessionKeyManager } from './components/SessionKeyManager/SessionKeyManager';
-export { default as SessionKeyInfo } from './components/SessionKeyManager/SessionKeyInfo';
-export { default as SessionKeyFunding } from './components/SessionKeyManager/SessionKeyFunding';
-export { default as SessionKeyTrash } from './components/SessionKeyManager/SessionKeyTrash';
-export { default as SessionKeyTrashProgress } from './components/SessionKeyManager/SessionKeyTrashProgress';
+export { default as SessionKeyManager } from '@/components/SessionKeyManager/SessionKeyManager';
+export { default as SessionKeyInfo } from '@/components/SessionKeyManager/SessionKeyInfo';
+export { default as SessionKeyFunding } from '@/components/SessionKeyManager/SessionKeyFunding';
+export { default as SessionKeyTrash } from '@/components/SessionKeyManager/SessionKeyTrash';
+export { default as SessionKeyTrashProgress } from '@/components/SessionKeyManager/SessionKeyTrashProgress';
 
 // Stores
-export { useSessionKeyStore } from './stores/sessionKey.store';
-export { useSessionKeyManagerStore, DeletionState } from './stores/sessionKeyManager.store';
+export { useSessionKeyStore } from '@/stores/sessionKey.store';
+export { useSessionKeyManagerStore, DeletionState } from '@/stores/sessionKeyManager.store';
 
 // Hooks
-export { useSessionKey } from './hooks/useSessionKey';
+export { useSessionKey } from '@/hooks/useSessionKey';
 
 // Types
 export type {
@@ -67,41 +70,3 @@ export {
     formatBalance,
     shortenAddress,
 } from './lib/utils';
-
-// UI Components (optional, for advanced usage)
-// export { Button } from './components/ui/button';
-// export type { ButtonProps } from './components/ui/button';
-// export {
-//     Dialog,
-//     DialogContent,
-//     DialogHeader,
-//     DialogTitle,
-//     DialogTrigger,
-//     DialogClose,
-// } from './components/ui/dialog';
-// export { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
-// export { Card, CardHeader, CardTitle, CardContent, CardFooter } from './components/ui/card';
-// export { Input } from './components/ui/input';
-// export { Label } from './components/ui/label';
-// export { Separator } from './components/ui/separator';
-// export { Progress } from './components/ui/progress';
-// export { Skeleton } from './components/ui/skeleton';
-// export { WalletAddress } from './components/ui/walletAddress';
-// export {
-//     AlertDialog,
-//     AlertDialogContent,
-//     AlertDialogHeader,
-//     AlertDialogTitle,
-//     AlertDialogDescription,
-//     AlertDialogFooter,
-//     AlertDialogAction,
-//     AlertDialogCancel,
-// } from './components/ui/alert-dialog';
-// export {
-//     DropdownMenu,
-//     DropdownMenuTrigger,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuLabel,
-//     DropdownMenuSeparator,
-// } from './components/ui/dropdown-menu';
