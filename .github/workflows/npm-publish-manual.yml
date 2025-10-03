@@ -1,0 +1,154 @@
+name: Publish (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to publish from (branch/tag/SHA)"
+        required: true
+        default: "main"
+      package_dir:
+        description: "Path to the package ('.' for root)"
+        required: true
+        default: "."
+      version_mode:
+        description: "How to choose the version"
+        type: choice
+        options: ["use-existing", "bump", "set-explicit"]
+        required: true
+        default: "use-existing"
+      bump:
+        description: "If version_mode=bump, choose increment"
+        type: choice
+        options: ["patch", "minor", "major", "prerelease"]
+        required: false
+        default: "patch"
+      preid:
+        description: "If bump=prerelease, preid (e.g. alpha, beta, rc)"
+        required: false
+        default: "rc"
+      explicit_version:
+        description: "If version_mode=set-explicit, set this exact semver"
+        required: false
+        default: ""
+      npm_tag:
+        description: "npm dist-tag"
+        required: true
+        default: "latest"
+      access:
+        description: "npm access (scoped packages need 'public' unless you pay for private)"
+        type: choice
+        options: ["public", "restricted"]
+        required: true
+        default: "public"
+      create_git_tag:
+        description: "Create & push a git tag like vX.Y.Z"
+        type: boolean
+        required: true
+        default: true
+      dry_run:
+        description: "Run npm publish --dry-run"
+        type: boolean
+        required: true
+        default: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to push tags/commits if we change version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0   # needed to push tags
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Install
+        working-directory: ${{ inputs.package_dir }}
+        run: npm ci
+
+      - name: Determine package name & current version
+        id: pkg
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          NAME=$(node -p "require('./package.json').name || ''")
+          VER=$(node -p "require('./package.json').version || ''")
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "Package: $NAME"
+          echo "Current version: $VER"
+
+      # ----- Version selection -----
+      - name: Bump version (npm version)
+        if: ${{ inputs.version_mode == 'bump' }}
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          if [ "${{ inputs.bump }}" = "prerelease" ]; then
+            npm version prerelease --preid "${{ inputs.preid }}" -m "chore(release): %s"
+          else
+            npm version "${{ inputs.bump }}" -m "chore(release): %s"
+          fi
+
+      - name: Set explicit version (without tagging)
+        if: ${{ inputs.version_mode == 'set-explicit' && inputs.explicit_version != '' }}
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          npm version ${{ inputs.explicit_version }} --no-git-tag-version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json || true
+          git commit -m "chore(release): set version to ${{ inputs.explicit_version }}" || echo "No changes to commit"
+
+      - name: Read final version
+        id: ver
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          FINAL=$(node -p "require('./package.json').version")
+          echo "final=$FINAL" >> $GITHUB_OUTPUT
+          echo "Final version: $FINAL"
+
+      - name: Create & push git tag
+        if: ${{ inputs.create_git_tag }}
+        run: |
+          TAG="v${{ steps.ver.outputs.final }}"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists; skipping."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+      # ----- Safety: fail early if version already on npm -----
+      - name: Check if version exists on npm
+        id: exist
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          NAME="${{ steps.pkg.outputs.name }}"
+          VER="${{ steps.ver.outputs.final }}"
+          if [ -z "$NAME" ] || [ -z "$VER" ]; then
+            echo "Name or version missing"; exit 1
+          fi
+          EXISTS=$(npm view "$NAME@$VER" version --json || true)
+          if [ -n "$EXISTS" ]; then
+            echo "This version already exists on npm: $NAME@$VER"
+            exit 1
+          fi
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ${{ inputs.package_dir }}
+        run: |
+          DRY=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
+          echo "Publishing with tag=${{ inputs.npm_tag }} access=${{ inputs.access }} $DRY"
+          npm publish --tag "${{ inputs.npm_tag }}" --access "${{ inputs.access }}" $DRY
