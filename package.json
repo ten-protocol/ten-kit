@@ -1,6 +1,6 @@
 {
   "name": "@tenprotocol/ten-kit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "description": "React components and hooks for connecting dapps to TEN Protocol",
   "main": "dist/index.js",
@@ -19,7 +19,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "styles.css"
   ],
   "scripts": {
     "build": "rollup -c",
