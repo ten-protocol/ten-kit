@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -7,11 +6,16 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { AlertCircle, Loader2, Wallet } from 'lucide-react';
-import { useConnect, useConnectors } from 'wagmi';
+import { AlertCircle } from 'lucide-react';
+import {Connector, useConnect, useConnectors} from 'wagmi';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ExternalLink } from 'lucide-react';
 import { DEFAULT_GATEWAY_URL } from '@/lib/constants';
+import {supportedWallets} from "@/lib/supportedWallets";
+import {useMemo} from "react";
+import ConnectWalletListItem from "@/components/ConnectWallet/ConnectWalletListItem";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import SupportedWallets from "@/components/ConnectWallet/SupportedWallets";
 
 type Props = {
     isOpen: boolean;
@@ -23,9 +27,81 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
     const { connect, isPending } = useConnect();
     const connectors = useConnectors();
 
-    const uniqueConnectors = connectors.filter(
-        (connector, index, self) => index === self.findIndex((c) => c.name === connector.name)
+    const usableWallets: Connector[] = [];
+    const unsupportedWallets: Connector[] = [];
+
+    connectors.forEach((connector) => {
+        const matchingSupportedWallet = supportedWallets.find(
+            (wallet) => wallet.name === connector.name
+        );
+
+        if (matchingSupportedWallet) {
+            usableWallets.push(connector);
+        } else {
+            unsupportedWallets.push(connector);
+        }
+    });
+
+    const unsupportedWalletList = useMemo(
+        () =>
+            unsupportedWallets
+                .filter((connector) => connector.icon)
+                .map((connector) => {
+                    return (
+                        <ConnectWalletListItem
+                            key={connector.id}
+                            onClick={() => {}}
+                            connector={connector}
+                            supported={false}
+                        />
+                    );
+                }),
+        [connectors]
     );
+
+    const usableWalletList = useMemo(
+        () =>
+            usableWallets.map((connector) => {
+                return (
+                    <ConnectWalletListItem
+                        key={connector.id}
+                        onClick={() => {
+                            connect({ connector });
+                        }}
+                        connector={connector}
+                        supported={true}
+                    />
+                );
+            }),
+        [connectors]
+    );
+
+    const WalletList = () => {
+        return (
+            <div className="grid gap-4 py-4">
+                {usableWalletList.length === 0 ? (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-center">
+                                You have no wallets compatible with TEN Protocol.
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <SupportedWallets />
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="flex flex-col gap-4">
+                        {usableWalletList.length > 0 && <h4>Your Supported Wallets</h4>}
+                        {usableWalletList}
+                    </div>
+                )}
+
+                {unsupportedWalletList.length > 0 && <h4>Your Unsupported Wallets</h4>}
+                {unsupportedWalletList}
+            </div>
+        );
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -58,44 +134,7 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
                 </Alert>
 
                 <div className="grid gap-4 py-4">
-                    {uniqueConnectors
-                        .filter((connector) => connector.name !== 'Injected')
-                        .map((connector) => (
-                            <Button
-                                key={connector.uid}
-                                variant="outline"
-                                className="w-full justify-start gap-4 h-14"
-                                onClick={() => {
-                                    connect({ connector });
-                                }}
-                                disabled={isPending}
-                            >
-                                {isPending ? (
-                                    <Loader2 className="h-6 w-6 animate-spin" />
-                                ) : connector.icon ? (
-                                    <img
-                                        src={connector.icon}
-                                        width={32}
-                                        height={32}
-                                        alt={connector.name}
-                                    />
-                                ) : (
-                                    <Wallet className="h-6 w-6" />
-                                )}
-                                <div className="flex flex-col items-start">
-                                    <span className="font-medium">
-                                        {connector.name === 'Injected'
-                                            ? 'Browser Wallet'
-                                            : connector.name}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                        {connector.type === 'injected'
-                                            ? 'Browser Extension'
-                                            : connector.type}
-                                    </span>
-                                </div>
-                            </Button>
-                        ))}
+                    <WalletList />
                 </div>
             </DialogContent>
         </Dialog>

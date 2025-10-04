@@ -1,6 +1,6 @@
 {
   "name": "@tenprotocol/ten-kit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "React components and hooks for connecting dapps to TEN Protocol",
   "main": "dist/index.js",
@@ -12,18 +12,17 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
     },
-    "./dist/styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/index.css"
   },
   "publishConfig": {
     "access": "public"
   },
   "files": [
     "dist",
-    "README.md",
-    "styles.css"
+    "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -48,11 +47,11 @@
     "url": "https://github.com/ten-protocol/ten-kit.git"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "wagmi": "^2.0.0",
     "viem": "^2.0.0",
-    "@tanstack/react-query": "^5.0.0",
+    "wagmi": "^2.0.0",
     "zustand": "^4.4.0"
   },
   "dependencies": {
@@ -60,6 +59,7 @@
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-react": "^0.400.0",
@@ -69,6 +69,7 @@
   "devDependencies": {
     "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@storybook/addon-essentials": "^7.0.0",
@@ -83,11 +84,13 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autoprefixer": "^10.4.0",
+    "cssnano": "^6.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.32.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-storybook": "^0.6.0",
     "postcss": "^8.4.0",
+    "postcss-cli": "^11.0.0",
     "rollup": "^4.0.0",
     "rollup-plugin-dts": "^6.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",

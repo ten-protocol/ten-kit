@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '@/lib/constants';
-import { ExternalLink } from 'lucide-react';
 import { useAccount, useBalance } from 'wagmi';
 import { useEffect, useState } from 'react';
 import ConnectModal from './ConnectModal';
@@ -77,12 +76,6 @@ export default function ConnectWalletButton({
                                     onClick={() => setIsSettingsOpen(true)}
                                 >
                                     SWITCH CHAIN
-                                </Button>
-
-                                <Button asChild className="" size="sm">
-                                    <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                                        ADD TEN <ExternalLink className="w-3 h-3" />
-                                    </a>
                                 </Button>
                             </div>
                         ) : (

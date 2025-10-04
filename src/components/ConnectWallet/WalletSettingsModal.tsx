@@ -12,6 +12,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAccount, useDisconnect, useSwitchChain, useBalance } from 'wagmi';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useEffect } from 'react';
 
 type Props = {
     isOpen: boolean;
@@ -26,9 +27,11 @@ export default function WalletSettingsModal({
     gatewayUrl = DEFAULT_GATEWAY_URL,
     onToast 
 }: Props) {
-    const { address, chain } = useAccount();
+    const { address, chain, connector } = useAccount();
     const { disconnect } = useDisconnect();
-    const { switchChain, isPending: isSwitchingChain, error: switchChainError } = useSwitchChain();
+    const { isPending: isSwitchingChain, error: switchChainError } = useSwitchChain();
+    const [chainExists, setChainExists] = useState<boolean | null>(null);
+    const [isCheckingChain, setIsCheckingChain] = useState(false);
 
     const { data: ethBalance, isLoading: isLoadingEthBalance } = useBalance({
         address,
@@ -37,11 +40,93 @@ export default function WalletSettingsModal({
 
     const isWrongChain = !chain || Number(chain.id) !== Number(TEN_CHAIN_ID);
 
+    useEffect(() => {
+        const checkChainExists = async () => {
+            if (!isOpen || !isWrongChain || !connector) {
+                return;
+            }
+
+            setIsCheckingChain(true);
+            setChainExists(null);
+
+            try {
+                const provider = await connector.getProvider() as any;
+                
+                if (!provider || typeof provider.request !== 'function') {
+                    setIsCheckingChain(false);
+                    return;
+                }
+
+                await provider.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${TEN_CHAIN_ID.toString(16)}` }],
+                });
+                
+                setChainExists(true);
+            } catch (error: any) {
+                // Error code 4902 means the chain has not been added
+                if (error.code === 4902) {
+                    setChainExists(false);
+                } else if (error.code === 4001) {
+                    // User rejected, but chain exists
+                    setChainExists(true);
+                } else {
+                    setChainExists(false);
+                }
+            } finally {
+                setIsCheckingChain(false);
+            }
+        };
+
+        checkChainExists();
+    }, [isOpen, isWrongChain, connector]);
+
     const handleSwitchChain = async () => {
+        if (!connector) {
+            console.error('No connector available');
+            return;
+        }
+
         try {
-            await switchChain({ chainId: TEN_CHAIN_ID });
-        } catch (error) {
-            console.error('Failed to switch chain:', error);
+            const provider = await connector.getProvider() as any;
+            
+            if (!provider || typeof provider.request !== 'function') {
+                console.error('Provider does not support request method');
+                return;
+            }
+
+            await provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: `0x${TEN_CHAIN_ID.toString(16)}` }],
+            });
+
+        } catch (error: any) {
+            console.error('Switch chain error:', error);
+            
+            // Error code 4902 means the chain has not been added to the wallet
+            if (error.code === 4902) {
+                const message = 'TEN Protocol has not been added to your wallet yet. Please add it first via the TEN Gateway.';
+                
+                if (onToast) {
+                    onToast(message, {
+                        duration: 5000,
+                        action: {
+                            label: 'Visit TEN Gateway',
+                            onClick: () => window.open(gatewayUrl, '_blank'),
+                        },
+                    });
+                } else {
+                    alert(message);
+                }
+                return;
+            }
+            
+            // Error code 4001 means user rejected the request
+            if (error.code === 4001) {
+                console.log('User rejected the switch chain request');
+                return;
+            }
+
             const message = 'Failed to switch to TEN Protocol. Please make sure you have added TEN Protocol to your wallet.';
             
             if (onToast) {
@@ -75,47 +160,86 @@ export default function WalletSettingsModal({
                         </p>
                         {isWrongChain && (
                             <div className="space-y-2">
-                                <p className="text-sm text-destructive">
-                                    You are on the wrong network. Please switch to TEN Protocol.
-                                </p>
-                                {switchChainError && (
-                                    <Alert variant="destructive" className="mt-2">
-                                        <AlertCircle className="h-4 w-4" />
-                                        <AlertTitle>Failed to switch network.</AlertTitle>
+                                {isCheckingChain ? (
+                                    <Alert>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <AlertTitle>Checking network...</AlertTitle>
                                         <AlertDescription>
-                                            Please make sure you have added TEN Protocol to your
-                                            wallet. Visit the{' '}
-                                            <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                                                <span className="inline-flex gap-1 justify-center items-center hover:underline text-bold text-white/80 hover:text-white">
-                                                    TEN Gateway <ExternalLink className="w-3 h-3" />
-                                                </span>
-                                            </a>{' '}
-                                            to get onboarded onto the network.
+                                            Verifying if TEN Protocol is available in your wallet.
                                         </AlertDescription>
                                     </Alert>
+                                ) : chainExists === false ? (
+                                    <>
+                                        <Alert variant="destructive">
+                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertTitle>Chain not found in wallet.</AlertTitle>
+                                            <AlertDescription>
+                                                Before you can use dApps on TEN Protocol you first have to add the chain to your wallet via the TEN Gateway.
+                                            </AlertDescription>
+                                            <Button asChild className="w-full mt-4">
+                                                <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
+                                                    Add TEN via Gateway{' '}
+                                                    <ExternalLink className="ml-2 w-4 h-4" />
+                                                </a>
+                                            </Button>
+                                        </Alert>
+
+                                    </>
+                                ) : chainExists === true ? (
+                                    <>
+                                        <Alert variant="destructive">
+                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertTitle>Wrong Network</AlertTitle>
+                                            <AlertDescription>
+                                                You are on the wrong network. Click below to switch to TEN Protocol.
+                                            </AlertDescription>
+                                        </Alert>
+                                        <Button
+                                            onClick={handleSwitchChain}
+                                            className="w-full"
+                                            disabled={isSwitchingChain}
+                                        >
+                                            {isSwitchingChain ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Switching...
+                                                </>
+                                            ) : (
+                                                'Switch to TEN Protocol'
+                                            )}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Alert variant="destructive">
+                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertTitle>Wrong Network</AlertTitle>
+                                            <AlertDescription>
+                                                You are on the wrong network. Please make sure you have added TEN Protocol to your wallet via the TEN Gateway.
+                                            </AlertDescription>
+                                        </Alert>
+                                        <Button asChild variant="outline" className="w-full">
+                                            <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
+                                                Add TEN to Wallet (Gateway){' '}
+                                                <ExternalLink className="ml-2 w-4 h-4" />
+                                            </a>
+                                        </Button>
+                                        <Button
+                                            onClick={handleSwitchChain}
+                                            className="w-full"
+                                            disabled={isSwitchingChain}
+                                        >
+                                            {isSwitchingChain ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Switching...
+                                                </>
+                                            ) : (
+                                                'Switch to TEN Protocol'
+                                            )}
+                                        </Button>
+                                    </>
                                 )}
-                                {switchChainError && (
-                                    <Button asChild variant="outline" className="w-full mt-2">
-                                        <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                                            Visit TEN Gateway{' '}
-                                            <ExternalLink className="ml-2 w-4 h-4" />
-                                        </a>
-                                    </Button>
-                                )}
-                                <Button
-                                    onClick={handleSwitchChain}
-                                    className="w-full"
-                                    disabled={isSwitchingChain}
-                                >
-                                    {isSwitchingChain ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Switching...
-                                        </>
-                                    ) : (
-                                        'Switch to TEN Protocol'
-                                    )}
-                                </Button>
                             </div>
                         )}
                     </div>

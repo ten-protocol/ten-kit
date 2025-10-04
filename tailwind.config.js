@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
-    './stories/**/*.{js,ts,jsx,tsx}',
+    ...(process.env.NODE_ENV !== 'production' ? ['./stories/**/*.{js,ts,jsx,tsx}'] : []),
   ],
   theme: {
     extend: {

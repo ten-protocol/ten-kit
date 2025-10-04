@@ -5,6 +5,7 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
 import dts from 'rollup-plugin-dts';
 import alias from '@rollup/plugin-alias';
+import image from '@rollup/plugin-image';
 import path from 'path';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -31,6 +32,7 @@ export default [
     ],
     plugins: [
       peerDepsExternal(),
+      image(),
       alias({
         entries: [
           { find: '@', replacement: path.resolve(__dirname, 'src') }

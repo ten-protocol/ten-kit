@@ -18,11 +18,14 @@ import SessionKeyFunding from './SessionKeyFunding';
 import SessionKeyTrash from './SessionKeyTrash';
 import SessionKeyTrashProgress from './SessionKeyTrashProgress';
 import { useSessionKeyStore } from '@/stores/sessionKey.store';
+import {TEN_CHAIN_ID} from "@/lib/constants";
 
 export default function SessionKeyManager() {
-    const { isConnected, connector } = useAccount();
+    const { isConnected, connector, chain } = useAccount();
     const { sessionKey, isLoading, error, balance } = useSessionKeyStore();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const isWrongChain = !chain || Number(chain.id) !== Number(TEN_CHAIN_ID);
+
     const { deletionState, isRefreshingBalance, initSession } =
         useSessionKeyManagerStore();
 
@@ -46,7 +49,7 @@ export default function SessionKeyManager() {
 
     // Render trigger button
     const renderTriggerButton = () => {
-        if (!isConnected) {
+        if (!isConnected || isWrongChain) {
             return null;
         }
 

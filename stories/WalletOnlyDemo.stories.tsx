@@ -2,9 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { 
     TENProvider,
-    ConnectWalletButton,
-    SessionKeyManager
-} from '../src/index';
+    ConnectWalletButton} from '../src/index';
 import {useAccount} from "wagmi";
 
 // Simple minimal usage example
