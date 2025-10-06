@@ -2,6 +2,8 @@
 
 React components and hooks for connecting dapps to TEN Protocol, featuring wallet connection, session key management, and privacy-preserving transactions.
 
+**Built on [wagmi](https://wagmi.sh/)** - This library provides a complete wagmi setup pre-configured for TEN Protocol, so you get all the power of wagmi with zero configuration needed.
+
 ## Features
 
 - **Wallet Connection**: Easy wallet connection with TEN Protocol network detection
@@ -10,7 +12,7 @@ React components and hooks for connecting dapps to TEN Protocol, featuring walle
 - **TypeScript**: Full TypeScript support with comprehensive type definitions
 - **Storybook**: Interactive component documentation and testing
 - **Zustand**: Efficient state management with persistence
-- **Wagmi Integration**: Built on top of wagmi for Ethereum interactions
+- **Wagmi Integration**: Built on top of wagmi v2 - get all wagmi hooks with TEN Protocol pre-configured
 
 ## Installation
 
@@ -37,10 +39,12 @@ pnpm add react react-dom wagmi viem @tanstack/react-query zustand
 **Required versions:**
 - `react` >= 16.8.0
 - `react-dom` >= 16.8.0
-- `wagmi` ^2.0.0
-- `viem` ^2.0.0
-- `@tanstack/react-query` ^5.0.0
-- `zustand` ^4.4.0
+- **`wagmi` ^2.0.0** - Core Ethereum hooks library (automatically configured for TEN)
+- **`viem` ^2.0.0** - Ethereum utilities used by wagmi
+- **`@tanstack/react-query` ^5.0.0** - Data fetching library used by wagmi
+- `zustand` ^4.4.0 - State management for session keys
+
+> **Note:** `TENProvider` includes `WagmiProvider` and `QueryClientProvider`, so you don't need to set these up separately. The library handles all wagmi configuration for TEN Protocol automatically.
 
 ### CSS Import
 
@@ -51,6 +55,36 @@ import '@tenprotocol/ten-kit/styles.css';
 ```
 
 This CSS file includes all the necessary styles for the components, including Tailwind utilities and custom component styles.
+
+## How it Works with Wagmi
+
+This library is built on top of [wagmi](https://wagmi.sh/) and provides:
+
+**Pre-configured wagmi setup** for TEN Protocol - no manual wagmi config needed  
+**All wagmi hooks available** - use `useAccount`, `useBalance`, `useReadContract`, etc.  
+**WagmiProvider and QueryClientProvider** - automatically wrapped by `TENProvider`  
+**Custom connectors** - includes injected wallet connector with TEN Protocol support
+
+**You don't need to set up wagmi separately** - just wrap your app with `TENProvider` and you're ready to use any wagmi hook alongside TEN-specific features.
+
+```tsx
+import { TENProvider, useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { useAccount, useBalance } from 'wagmi'; // wagmi hooks work out of the box!
+
+function MyApp() {
+  return (
+    <TENProvider>
+      <MyComponent />
+    </TENProvider>
+  );
+}
+
+function MyComponent() {
+  const { address } = useAccount(); // wagmi hook
+  const { sessionKey } = useSessionKeyStore(); // ten-kit hook
+  // Both work seamlessly together!
+}
+```
 
 ## Quick Start
 
@@ -217,6 +251,13 @@ const MyContractComponent = () => {
 
 The main provider component that sets up wagmi and React Query for TEN Protocol.
 
+**What it does:**
+- Wraps your app with `WagmiProvider` configured for TEN Protocol
+- Wraps your app with `QueryClientProvider` for data fetching
+- Configures injected wallet connector (MetaMask, Rabby, etc.)
+- Sets up TEN Protocol chain configuration
+- Enables all wagmi hooks to work with TEN Protocol
+
 ```tsx
 interface TENProviderProps {
   children: ReactNode;
@@ -228,17 +269,38 @@ interface TENProviderProps {
 
 **Props:**
 - `children`: Your app content
-- `config`: Custom TEN Protocol configuration (optional)
-- `queryClient`: Custom React Query client (optional)
-- `enableSepolia`: Enable Sepolia testnet alongside TEN (optional, default: false)
+- `config`: Custom TEN Protocol chain configuration (optional)
+- `queryClient`: Custom React Query client instance (optional)
 
-**Usage:**
+**Basic Usage:**
 ```tsx
-import { TENProvider } from '@ten-protocol/ten-kit';
+import { TENProvider } from '@tenprotocol/ten-kit';
 
 function App() {
   return (
     <TENProvider>
+      <YourDappContent />
+    </TENProvider>
+  );
+}
+```
+
+**Advanced Usage with Custom QueryClient:**
+```tsx
+import { TENProvider } from '@tenprotocol/ten-kit';
+import { QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function App() {
+  return (
+    <TENProvider queryClient={queryClient} enableSepolia={true}>
       <YourDappContent />
     </TENProvider>
   );
@@ -623,6 +685,57 @@ export default function Providers({ children }: { children: ReactNode }) {
 }
 ```
 
+### Using Wagmi Hooks
+
+Since this library is built on wagmi, you can use any wagmi hook alongside TEN-specific features:
+
+```tsx
+import { TENProvider, useSessionKeyStore, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { 
+  useAccount, 
+  useBalance, 
+  useBlockNumber,
+  useReadContract,
+  useWatchBlockNumber 
+} from 'wagmi';
+
+function MyComponent() {
+  // Wagmi hooks work out of the box
+  const { address, isConnected } = useAccount();
+  const { data: balance } = useBalance({ address });
+  const { data: blockNumber } = useBlockNumber();
+  
+  // TEN-specific hooks
+  const { sessionKey, sendTransaction } = useSessionKeyStore();
+  
+  // Read from a contract
+  const { data: contractData } = useReadContract({
+    address: '0xYourContract',
+    abi: YOUR_ABI,
+    functionName: 'getData',
+  });
+
+  return (
+    <div>
+      <p>Address: {address}</p>
+      <p>Balance: {balance?.formatted} ETH</p>
+      <p>Block: {blockNumber?.toString()}</p>
+      <p>Session Key: {sessionKey ? 'Active' : 'None'}</p>
+      <p>Contract Data: {contractData}</p>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <TENProvider>
+      <ConnectWalletButton />
+      <MyComponent />
+    </TENProvider>
+  );
+}
+```
+
 ### Complete Example with Contract Interaction
 
 Real-world example showing how to interact with a smart contract using session keys:
@@ -693,6 +806,84 @@ export default function BettingComponent() {
     </div>
   );
 }
+```
+
+### Using Session Key Store in Another Zustand Store
+
+If you're building complex applications with multiple Zustand stores, you can access the session key store from within your other stores using `getState()`:
+
+```tsx
+import { create } from 'zustand';
+import { useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { Address, formatEther } from 'viem';
+
+export type GameEvent = {
+  gameId: bigint;
+  player: Address;
+  amount: bigint;
+};
+
+export type GameStore = {
+  playerHasBet: boolean;
+  bets: Array<{ player: Address; amount: number }>;
+  handleBetPlaced: (event: GameEvent) => void;
+};
+
+export const useGameStore = create<GameStore>()((set, get) => ({
+  playerHasBet: false,
+  bets: [],
+
+  handleBetPlaced: (event) => {
+    // Access session key from the session key store
+    const { sessionKey } = useSessionKeyStore.getState();
+
+    // Check if the bet was placed by the current user's session key
+    const isPlayerBet = sessionKey?.toUpperCase() === event.player.toUpperCase();
+
+    if (isPlayerBet) {
+      set({ playerHasBet: true });
+    }
+
+    // Add bet to the list
+    set({
+      bets: [
+        {
+          player: event.player,
+          amount: Number(formatEther(event.amount)),
+        },
+        ...get().bets,
+      ],
+    });
+  },
+}));
+```
+
+**Key Points:**
+- Use `useSessionKeyStore.getState()` to access the store from outside React components
+- This is useful for event handlers, middleware, or other Zustand stores
+- The session key is stored as a string (the address) or `null` if not created
+- You can also access `sendTransaction`, `balance`, and other store properties this way
+
+**Another Example - Checking if User is Connected:**
+
+```tsx
+import { create } from 'zustand';
+import { useSessionKeyStore } from '@tenprotocol/ten-kit';
+
+export const useAppStore = create()((set) => ({
+  isReady: false,
+  
+  checkReadyState: () => {
+    const { sessionKey, isActive } = useSessionKeyStore.getState();
+    
+    // Check if user has an active session key
+    if (sessionKey && isActive) {
+      set({ isReady: true });
+    } else {
+      set({ isReady: false });
+    }
+  },
+}));
 ```
 
 ### Custom TEN Configuration
