@@ -547,6 +547,68 @@ const { maxFeePerGas, maxPriorityFeePerGas } = await calculateGasFees(provider);
 const blockNumber = await getLatestBlockNumber(provider);
 ```
 
+#### `CreatePublicClients`
+
+Creates configured viem public clients for reading public on-chain data and listening to events without requiring wallet connection.
+
+```tsx
+import { CreatePublicClients, type TENPublicClients } from '@tenprotocol/ten-kit';
+
+// Initialize public clients
+const clients: TENPublicClients = await CreatePublicClients();
+
+// Use HTTP client for reading contract data
+const totalSupply = await clients.httpsClient.readContract({
+  address: '0xYourContract',
+  abi: YOUR_ABI,
+  functionName: 'totalSupply',
+});
+
+const balance = await clients.httpsClient.readContract({
+  address: '0xYourContract',
+  abi: YOUR_ABI,
+  functionName: 'balanceOf',
+  args: ['0xUserAddress'],
+});
+
+// Use WebSocket client for listening to events
+const unwatch = clients.websocketClient.watchContractEvent({
+  address: '0xYourContract',
+  abi: YOUR_ABI,
+  eventName: 'Transfer',
+  onLogs: (logs) => {
+    console.log('New transfer events:', logs);
+  },
+});
+
+// Clean up when done
+unwatch();
+```
+
+**Returns:**
+```tsx
+interface TENPublicClients {
+  httpsClient: PublicClient<Transport, Chain>;
+  websocketClient: PublicClient<Transport, Chain>;
+}
+```
+
+**Features:**
+- Automatically manages TEN network authentication tokens
+- Caches tokens in localStorage with 24-hour expiration
+- Handles token refresh and revocation automatically
+- Retry logic with exponential backoff for network failures
+- Full viem public client API support
+
+**Use Cases:**
+- Reading contract state without wallet connection
+- Watching blockchain events in real-time
+- Building read-only dashboards and analytics
+- Displaying token balances and supply information
+- Monitoring contract events for notifications
+
+See the [Fetching Public Data and Listening for Events](#fetching-public-data-and-listening-for-events) example for a complete implementation.
+
 ## TypeScript
 
 This package is written in TypeScript and exports all necessary types:
@@ -563,6 +625,9 @@ import type {
   // Session Key Types
   SessionKeyStore,
   TransactionParams,
+  
+  // Public Clients
+  TENPublicClients,
   
   // Configuration
   TenConfig,
@@ -884,6 +949,148 @@ export const useAppStore = create()((set) => ({
     }
   },
 }));
+```
+
+### Fetching Public Data and Listening for Events
+
+For reading public on-chain data and listening to events without requiring a wallet connection, you can use `CreatePublicClients` to get configured viem public clients:
+
+```tsx
+import { useEffect, useState } from 'react';
+import { CreatePublicClients, type TENPublicClients } from '@tenprotocol/ten-kit';
+import { formatEther, parseAbi } from 'viem';
+
+const CONTRACT_ADDRESS = '0xYourContractAddress';
+const CONTRACT_ABI = parseAbi([
+  'function totalSupply() view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+]);
+
+function PublicDataComponent() {
+  const [clients, setClients] = useState<TENPublicClients | null>(null);
+  const [totalSupply, setTotalSupply] = useState<string>('0');
+  const [userBalance, setUserBalance] = useState<string>('0');
+  const [latestTransfer, setLatestTransfer] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initClients = async () => {
+      try {
+        const publicClients = await CreatePublicClients();
+        setClients(publicClients);
+      } catch (error) {
+        console.error('Failed to initialize public clients:', error);
+      }
+    };
+
+    initClients();
+  }, []);
+
+  useEffect(() => {
+    if (!clients) return;
+
+    const fetchData = async () => {
+      try {
+        const supply = await clients.httpsClient.readContract({
+          address: CONTRACT_ADDRESS,
+          abi: CONTRACT_ABI,
+          functionName: 'totalSupply',
+        });
+        setTotalSupply(formatEther(supply as bigint));
+
+        const balance = await clients.httpsClient.readContract({
+          address: CONTRACT_ADDRESS,
+          abi: CONTRACT_ABI,
+          functionName: 'balanceOf',
+          args: ['0xUserAddress'],
+        });
+        setUserBalance(formatEther(balance as bigint));
+      } catch (error) {
+        console.error('Error fetching contract data:', error);
+      }
+    };
+
+    fetchData();
+
+    const unwatch = clients.websocketClient.watchContractEvent({
+      address: CONTRACT_ADDRESS,
+      abi: CONTRACT_ABI,
+      eventName: 'Transfer',
+      onLogs: (logs) => {
+        logs.forEach((log) => {
+          if (log.args) {
+            const { from, to, value } = log.args;
+            setLatestTransfer(
+              `${from} → ${to}: ${formatEther(value as bigint)} tokens`
+            );
+          }
+        });
+      },
+    });
+
+    return () => {
+      unwatch();
+    };
+  }, [clients]);
+
+  return (
+    <div>
+      <h2>Token Information</h2>
+      <p>Total Supply: {totalSupply} tokens</p>
+      <p>User Balance: {userBalance} tokens</p>
+      {latestTransfer && (
+        <div>
+          <h3>Latest Transfer:</h3>
+          <p>{latestTransfer}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default PublicDataComponent;
+```
+
+**Key Features:**
+- **No wallet connection required** - `CreatePublicClients` works independently
+- **Automatic token management** - Handles TEN network authentication tokens with caching and expiration
+- **HTTP and WebSocket support** - Get both client types for different use cases
+- **Standard viem API** - Use all viem public client methods (`readContract`, `watchContractEvent`, `getBlockNumber`, etc.)
+- **Event listening** - Real-time event monitoring via WebSocket with automatic reconnection
+
+**Common Use Cases:**
+```tsx
+// Read contract state
+const balance = await clients.httpsClient.readContract({
+  address: CONTRACT_ADDRESS,
+  abi: YOUR_ABI,
+  functionName: 'balanceOf',
+  args: ['0xUserAddress'],
+});
+
+// Read multiple contract values
+const [supply, paused] = await Promise.all([
+  clients.httpsClient.readContract({
+    address: CONTRACT_ADDRESS,
+    abi: YOUR_ABI,
+    functionName: 'totalSupply',
+  }),
+  clients.httpsClient.readContract({
+    address: CONTRACT_ADDRESS,
+    abi: YOUR_ABI,
+    functionName: 'paused',
+  }),
+]);
+
+// Watch for contract events in real-time
+const unwatchEvents = clients.websocketClient.watchContractEvent({
+  address: CONTRACT_ADDRESS,
+  abi: CONTRACT_ABI,
+  eventName: 'MyEvent',
+  onLogs: (logs) => {
+    logs.forEach((log) => console.log('New event:', log));
+  },
+});
 ```
 
 ### Custom TEN Configuration

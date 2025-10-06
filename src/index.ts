@@ -25,6 +25,10 @@ export { useSessionKeyManagerStore, DeletionState } from '@/stores/sessionKeyMan
 // Hooks
 export { useSessionKey } from '@/hooks/useSessionKey';
 
+// Contract methods
+export { CreatePublicClients } from '@/lib/contractReadFunctions'
+export type { TENPublicClients } from '@/lib/contractReadFunctions'
+
 // Types
 export type {
     EIP1193Provider,
