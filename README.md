@@ -47,126 +47,178 @@ pnpm add react react-dom wagmi viem @tanstack/react-query zustand
 Import the required CSS file in your app's entry point (e.g., `_app.tsx`, `main.tsx`, or `index.tsx`):
 
 ```tsx
-import '@ten-protocol/ten-kit/dist/styles.css';
+import '@tenprotocol/ten-kit/styles.css';
 ```
 
 This CSS file includes all the necessary styles for the components, including Tailwind utilities and custom component styles.
 
 ## Quick Start
 
-### 1. Wrap your app with TenProvider
+### Basic Example: Wallet Connection Only
+
+The simplest setup - just wallet connection without session keys:
 
 ```tsx
-import { TenProvider } from '@ten-protocol/ten-kit';
+import React from 'react';
+import { TENProvider, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { useAccount } from 'wagmi';
 
-function App() {
+const MyDApp = () => (
+  <TENProvider>
+    <div className="p-8 max-w-md mx-auto">
+      <header className="flex flex-col justify-center items-center">
+        <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
+        <ConnectWalletButton />
+      </header>
+      <AppContent />
+    </div>
+  </TENProvider>
+);
+
+const AppContent = () => {
+  const { isConnected } = useAccount();
+
+  if (!isConnected) {
+    return <p>Please connect your wallet.</p>;
+  }
+
   return (
-    <TENProvider>
-      <YourDappContent />
-    </TENProvider>
+    <div className="text-center space-y-4">
+      <p className="text-gray-600">
+        Your dApp content goes here. It will only be visible when
+        the user is connected to TEN Protocol.
+      </p>
+      <button className="w-full bg-blue-500 text-white py-2 px-4 rounded">
+        Private Action
+      </button>
+    </div>
   );
-}
+};
+
+export default MyDApp;
 ```
 
-### 2. Use the ConnectWalletWrapper
+### Advanced Example: With Session Keys
+
+For privacy-preserving transactions, add the `SessionKeyManager` component:
 
 ```tsx
-import { ConnectWalletWrapper } from '@ten-protocol/ten-kit';
+import React from 'react';
+import { 
+  TENProvider, 
+  ConnectWalletButton, 
+  SessionKeyManager,
+  useSessionKeyStore 
+} from '@tenprotocol/ten-kit';
+import { useAccount } from 'wagmi';
 
-function YourDappContent() {
+const MyDApp = () => (
+  <TENProvider>
+    <div className="p-8 max-w-md mx-auto">
+      <header className="flex flex-col justify-center items-center">
+        <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
+        <div className="flex gap-4 justify-center mb-6">
+          <ConnectWalletButton />
+          <SessionKeyManager />
+        </div>
+      </header>
+      <AppContent />
+    </div>
+  </TENProvider>
+);
+
+const AppContent = () => {
+  const { isConnected } = useAccount();
+  const { sessionKey } = useSessionKeyStore();
+
+  if (!isConnected || !sessionKey) {
+    return <p>Please connect your wallet and create a session key.</p>;
+  }
+
   return (
-      <TENProvider>
-        <ConnectWalletWrapper loading={false}>
-          <div>
-            <h1>Your dApp Content</h1>
-            <p>This content is only visible when connected to TEN Protocol</p>
-          </div>
-        </ConnectWalletWrapper>
-      </TENProvider>
+    <div className="text-center space-y-4">
+      <p className="text-gray-600">
+        Your dApp content goes here. All transactions are
+        privacy-preserving thanks to TEN Protocol.
+      </p>
+      <button className="w-full bg-blue-500 text-white py-2 px-4 rounded">
+        Private Action
+      </button>
+    </div>
   );
-}
+};
+
+export default MyDApp;
 ```
 
-### 3. Add a Connect Button
+### Sending Transactions with Session Keys
+
+Use the `sendTransaction` method from `useSessionKeyStore` to send privacy-preserving transactions:
 
 ```tsx
-import { ConnectWalletButton } from '@ten-protocol/ten-kit';
+import React, { useState } from 'react';
+import { useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { encodeFunctionData, parseEther } from 'viem';
+import { useAccount } from 'wagmi';
 
-function Header() {
-  return (
-    <header>
-      <h1>My dApp</h1>
-      <ConnectWalletButton />
-    </header>
-  );
-}
-```
+const MyContractComponent = () => {
+  const { isConnected } = useAccount();
+  const { sendTransaction, sessionKey } = useSessionKeyStore();
+  const [amount, setAmount] = useState('0.01');
 
-### 4. Use Session Keys for Privacy
-
-```tsx
-import { useSessionKey } from '@ten-protocol/ten-kit';
-import { useConnectorClient } from 'wagmi';
-
-function SessionKeyManager() {
-  const { data: client } = useConnectorClient();
-  const {
-    sessionKey,
-    balance,
-    isLoading,
-    createSessionKey,
-    fundSessionKey,
-    sendTransaction,
-  } = useSessionKey();
-
-  const handleCreateSessionKey = async () => {
-    if (client) {
-      await createSessionKey(client.provider);
+  const handleTransaction = async () => {
+    if (!isConnected || !sessionKey) {
+      alert('Please connect wallet and create a session key');
+      return;
     }
-  };
 
-  const handleSendTransaction = async () => {
-    if (client && sessionKey) {
-      const txHash = await sendTransaction(
-        {
-          to: '0x...',
-          data: '0x...',
-          value: '0x0',
-        },
-        client.provider
-      );
+    try {
+      // Encode contract function call
+      const data = encodeFunctionData({
+        abi: YOUR_CONTRACT_ABI,
+        functionName: 'yourFunction',
+        args: [/* your args */],
+      });
+
+      // Send transaction through session key
+      const txHash = await sendTransaction({
+        to: '0xYourContractAddress',
+        value: `0x${parseEther(amount).toString(16)}`,
+        data,
+      });
+
       console.log('Transaction sent:', txHash);
+    } catch (error) {
+      console.error('Transaction failed:', error);
     }
   };
 
   return (
     <div>
-      {!sessionKey ? (
-        <button onClick={handleCreateSessionKey} disabled={isLoading}>
-          Create Session Key
-        </button>
-      ) : (
-        <div>
-          <p>Session Key: {sessionKey.slice(0, 6)}...{sessionKey.slice(-4)}</p>
-          <p>Balance: {balance?.eth} ETH</p>
-          <button onClick={handleSendTransaction}>Send Transaction</button>
-        </div>
-      )}
+      <input
+        type="number"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder="Amount"
+      />
+      <button onClick={handleTransaction}>
+        Send Transaction
+      </button>
     </div>
   );
-}
+};
 ```
 
 ## API Reference
 
 ### Components
 
-#### `TenProvider`
+#### `TENProvider`
 
 The main provider component that sets up wagmi and React Query for TEN Protocol.
 
 ```tsx
-interface TenProviderProps {
+interface TENProviderProps {
   children: ReactNode;
   config?: TenConfig;
   queryClient?: QueryClient;
@@ -179,6 +231,19 @@ interface TenProviderProps {
 - `config`: Custom TEN Protocol configuration (optional)
 - `queryClient`: Custom React Query client (optional)
 - `enableSepolia`: Enable Sepolia testnet alongside TEN (optional, default: false)
+
+**Usage:**
+```tsx
+import { TENProvider } from '@ten-protocol/ten-kit';
+
+function App() {
+  return (
+    <TENProvider>
+      <YourDappContent />
+    </TENProvider>
+  );
+}
+```
 
 #### `ConnectWalletWrapper`
 
@@ -218,11 +283,48 @@ interface ConnectWalletButtonProps {
 - `onChainChange`: Callback when chain changes
 - `gatewayUrl`: Custom TEN Gateway URL (optional)
 
+**Usage:**
+```tsx
+import { ConnectWalletButton } from '@tenprotocol/ten-kit';
+
+function Header() {
+  return <ConnectWalletButton />;
+}
+```
+
+#### `SessionKeyManager`
+
+A complete session key management UI component with create, fund, and delete capabilities.
+
+**Props:**
+- None required (uses internal state management)
+
+**Features:**
+- Create new session keys
+- Fund session keys with ETH
+- Display session key balance
+- Delete session keys
+- Automatic balance updates
+
+**Usage:**
+```tsx
+import { SessionKeyManager } from '@tenprotocol/ten-kit';
+
+function Header() {
+  return (
+    <div className="flex gap-4">
+      <ConnectWalletButton />
+      <SessionKeyManager />
+    </div>
+  );
+}
+```
+
 ### Hooks
 
-#### `useSessionKey`
+#### `useSessionKeyStore`
 
-Hook for managing TEN Protocol session keys.
+**Recommended:** The main hook for accessing and managing session keys. Use this for sending transactions and checking session key state.
 
 ```tsx
 const {
@@ -234,6 +336,68 @@ const {
   error,
   
   // Actions
+  sendTransaction,
+  createSessionKey,
+  fundSessionKey,
+  deleteSessionKey,
+  updateBalance,
+  reset,
+} = useSessionKeyStore();
+```
+
+**State:**
+- `sessionKey`: Current session key address (string | null)
+- `isActive`: Whether session key is active (boolean)
+- `balance`: Session key balance object with `eth` and `wei` properties
+- `isLoading`: Loading state for operations (boolean)
+- `error`: Error state (Error | null)
+
+**Actions:**
+- `sendTransaction(txParams)`: Send a privacy-preserving transaction through the session key
+  - `txParams`: `{ to: string, value: string, data: string }`
+  - Returns: `Promise<string>` (transaction hash)
+- `createSessionKey()`: Create a new session key
+- `fundSessionKey(address, amount, userAddress)`: Fund a session key with ETH
+- `deleteSessionKey()`: Delete the current session key
+- `updateBalance()`: Manually refresh the session key balance
+- `reset()`: Reset all state
+
+**Example:**
+```tsx
+import { useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { encodeFunctionData, parseEther } from 'viem';
+
+function MyComponent() {
+  const { sessionKey, sendTransaction } = useSessionKeyStore();
+
+  const handleTransaction = async () => {
+    const data = encodeFunctionData({
+      abi: MyContractABI,
+      functionName: 'myFunction',
+    });
+
+    const txHash = await sendTransaction({
+      to: '0xContractAddress',
+      value: `0x${parseEther('0.01').toString(16)}`,
+      data,
+    });
+  };
+
+  return <button onClick={handleTransaction}>Send TX</button>;
+}
+```
+
+#### `useSessionKey`
+
+A simplified hook that wraps `useSessionKeyStore`. Use `useSessionKeyStore` directly for better performance.
+
+```tsx
+const {
+  sessionKey,
+  isActive,
+  balance,
+  isLoading,
+  error,
   createSessionKey,
   fundSessionKey,
   deleteSessionKey,
@@ -243,20 +407,6 @@ const {
   reset,
 } = useSessionKey();
 ```
-
-**Returns:**
-- `sessionKey`: Current session key address
-- `isActive`: Whether session key is active
-- `balance`: Session key balance information
-- `isLoading`: Loading state for operations
-- `error`: Error state
-- `createSessionKey(provider)`: Create a new session key
-- `fundSessionKey(address, amount, provider, userAddress)`: Fund a session key
-- `deleteSessionKey(provider)`: Delete current session key
-- `cleanupSessionKey(provider)`: Cleanup session key
-- `updateBalance(address, provider)`: Update session key balance
-- `sendTransaction(txParams, provider)`: Send a privacy-preserving transaction
-- `reset()`: Reset all state
 
 ### Constants
 
@@ -271,14 +421,105 @@ import {
 
 ### Utilities
 
+The package exports several utility functions for common operations:
+
+#### Formatting Utilities
+
+```tsx
+import { formatBalance, shortenAddress } from '@tenprotocol/ten-kit';
+
+// Format ETH balance for display
+const formatted = formatBalance('1.23456789'); // '1.23'
+
+// Shorten Ethereum address
+const short = shortenAddress('0x1234...5678'); // '0x12...5678'
+```
+
+#### Encoding/Decoding Utilities
+
 ```tsx
 import {
-  formatBalance,
-  shortenAddress,
   parseEther,
   formatEther,
   toHex,
-} from '@ten-protocol/ten-kit';
+  hexToBytes,
+  bytesToHex,
+  hexToAscii,
+} from '@tenprotocol/ten-kit';
+
+// Convert ETH to wei
+const wei = parseEther('1.0'); // 1000000000000000000n
+
+// Convert wei to ETH
+const eth = formatEther(wei); // '1.0'
+
+// Convert number to hex
+const hex = toHex(255); // '0xff'
+
+// Convert hex to bytes
+const bytes = hexToBytes('0xff');
+
+// Convert bytes to hex
+const hexStr = bytesToHex(bytes);
+
+// Convert hex to ASCII
+const ascii = hexToAscii('0x48656c6c6f'); // 'Hello'
+```
+
+#### Helper Functions
+
+```tsx
+import {
+  checkTenNetwork,
+  calculateGasFees,
+  getLatestBlockNumber,
+} from '@tenprotocol/ten-kit';
+
+// Verify connected to TEN network
+await checkTenNetwork(provider);
+
+// Calculate gas fees for transaction
+const { maxFeePerGas, maxPriorityFeePerGas } = await calculateGasFees(provider);
+
+// Get latest block number
+const blockNumber = await getLatestBlockNumber(provider);
+```
+
+## TypeScript
+
+This package is written in TypeScript and exports all necessary types:
+
+```tsx
+import type {
+  // Provider Props
+  TenProviderProps,
+  
+  // Component Props
+  ConnectWalletButtonProps,
+  ConnectWalletWrapperProps,
+  
+  // Session Key Types
+  SessionKeyStore,
+  TransactionParams,
+  
+  // Configuration
+  TenConfig,
+  EIP1193Provider,
+} from '@tenprotocol/ten-kit';
+
+// Example: Transaction Parameters
+const txParams: TransactionParams = {
+  to: '0x...',
+  value: '0x0',
+  data: '0x...',
+};
+
+// Example: Custom Config
+const config: TenConfig = {
+  id: 8443,
+  name: 'TEN Protocol',
+  // ...
+};
 ```
 
 ## Styling
@@ -342,10 +583,125 @@ npm run type-check
 
 ## Examples
 
-### Custom TEN Configuration
+### Next.js Setup
+
+For Next.js applications, set up your providers in a client component:
 
 ```tsx
-import { TenProvider } from '@ten-protocol/ten-kit';
+// app/layout.tsx
+import '@tenprotocol/ten-kit/styles.css';
+import './globals.css';
+import Providers from './providers';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx
+// app/providers.tsx
+'use client';
+
+import { TENProvider } from '@tenprotocol/ten-kit';
+import { QueryClient } from '@tanstack/react-query';
+import { ReactNode } from 'react';
+
+const queryClient = new QueryClient();
+
+export default function Providers({ children }: { children: ReactNode }) {
+  return (
+    <TENProvider queryClient={queryClient}>
+      {children}
+    </TENProvider>
+  );
+}
+```
+
+### Complete Example with Contract Interaction
+
+Real-world example showing how to interact with a smart contract using session keys:
+
+```tsx
+import { useState } from 'react';
+import { useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { encodeFunctionData, parseEther } from 'viem';
+import { useAccount } from 'wagmi';
+import { toast } from 'sonner';
+
+const CONTRACT_ADDRESS = '0xYourContractAddress';
+const CONTRACT_ABI = [/* your ABI */];
+
+export default function BettingComponent() {
+  const { isConnected } = useAccount();
+  const { sendTransaction, sessionKey } = useSessionKeyStore();
+  const [betAmount, setBetAmount] = useState('0.01');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePlaceBet = async () => {
+    if (!isConnected || !sessionKey) {
+      toast.error('Please connect your wallet and create a session key');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Encode the contract function call
+      const data = encodeFunctionData({
+        abi: CONTRACT_ABI,
+        functionName: 'placeBet',
+      });
+
+      // Send transaction through session key
+      const txHash = await sendTransaction({
+        to: CONTRACT_ADDRESS,
+        value: `0x${parseEther(betAmount).toString(16)}`,
+        data,
+      });
+
+      toast.success(`Bet placed! TX: ${txHash}`);
+      console.log('Transaction hash:', txHash);
+    } catch (error) {
+      console.error('Error placing bet:', error);
+      toast.error('Failed to place bet');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="number"
+        value={betAmount}
+        onChange={(e) => setBetAmount(e.target.value)}
+        placeholder="Bet Amount (ETH)"
+        min="0.001"
+        step="0.001"
+      />
+      <button 
+        onClick={handlePlaceBet} 
+        disabled={isLoading || !sessionKey}
+      >
+        {isLoading ? 'Processing...' : 'Place Bet'}
+      </button>
+    </div>
+  );
+}
+```
+
+### Custom TEN Configuration
+
+You can provide a custom configuration for different TEN networks:
+
+```tsx
+import { TENProvider } from '@tenprotocol/ten-kit';
+import { QueryClient } from '@tanstack/react-query';
 
 const customConfig = {
   id: 8443,
@@ -360,50 +716,15 @@ const customConfig = {
       http: ['https://your-custom-rpc.com'],
     },
   },
-  blockExplorers: {
-    default: { 
-      name: 'Custom Explorer', 
-      url: 'https://your-explorer.com' 
-    },
-  },
 };
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <TenProvider config={customConfig}>
+    <TENProvider config={customConfig} queryClient={queryClient}>
       <YourApp />
-    </TenProvider>
-  );
-}
-```
-
-### Error Handling
-
-```tsx
-import { ConnectWalletWrapper } from '@ten-protocol/ten-kit';
-import { useState, useEffect } from 'react';
-
-function MyDapp() {
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Your data fetching logic
-    fetchData()
-      .then(() => setLoading(false))
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
-  }, []);
-
-  return (
-    <ConnectWalletWrapper 
-      loading={loading} 
-      errorState={error}
-    >
-      <YourDappContent />
-    </ConnectWalletWrapper>
+    </TENProvider>
   );
 }
 ```
