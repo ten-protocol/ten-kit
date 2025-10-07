@@ -33,6 +33,7 @@ export type { TENPublicClients } from '@/lib/contractReadFunctions'
 export type {
     EIP1193Provider,
     TransactionParams,
+    TransactionReceipt,
     StateSubscriber,
     SessionKeyStore,
     TenConfig,

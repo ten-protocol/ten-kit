@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import {ReactNode, useEffect} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import { WagmiProvider, createConfig } from 'wagmi';
 import { defineChain, http } from 'viem';
@@ -36,7 +36,9 @@ export function TENProvider({
         transports,
     });
 
-    setWagmiConfig(wagmiConfig);
+    useEffect(() => {
+        setWagmiConfig(wagmiConfig);
+    }, []);
 
     return (
         <WagmiProvider config={wagmiConfig}>

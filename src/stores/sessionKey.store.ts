@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { encode as rlpEncode } from 'rlp';
 
-import type {SessionKeyStore, TransactionParams, SessionBalanceObject} from '@/lib/types';
+import type {SessionKeyStore, TransactionParams, SessionBalanceObject, TransactionReceipt} from '@/lib/types';
 import { LOCAL_STORAGE_KEY, TEN_ADDRESSES } from '@/lib/constants';
 import {
     parseEther,
@@ -404,6 +404,45 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 } catch (error) {
                     const err = error instanceof Error ? error : new Error('Transaction failed');
                     set({ error: err, isLoading: false });
+                    throw err;
+                }
+            },
+
+            waitForReceipt: async (txHash: string, timeout: number = 30000): Promise<TransactionReceipt> => {
+                try {
+                    const provider = get().provider;
+                    if (!provider) {
+                        throw new Error('No provider available');
+                    }
+
+                    const startTime = Date.now();
+                    const pollInterval = 1000; 
+
+                    while (true) {
+                        if (Date.now() - startTime > timeout) {
+                            throw new Error(`Transaction receipt timeout after ${timeout}ms`);
+                        }
+
+                        const receipt = await provider.request({
+                            method: 'eth_getTransactionReceipt',
+                            params: [txHash],
+                        });
+
+                        if (receipt) {
+                            console.log('Transaction mined:', txHash);
+                            
+                            if (receipt.status === '0x0') {
+                                throw new Error('Transaction reverted');
+                            }
+
+                            get().updateBalance();
+                            return receipt as TransactionReceipt;
+                        }
+
+                        await new Promise((resolve) => setTimeout(resolve, pollInterval));
+                    }
+                } catch (error) {
+                    const err = error instanceof Error ? error : new Error('Failed to get receipt');
                     throw err;
                 }
             },

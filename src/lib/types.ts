@@ -29,6 +29,33 @@ export interface TransactionParams {
     maxPriorityFeePerGas?: string | bigint;
 }
 
+export interface TransactionReceipt {
+    transactionHash: string;
+    transactionIndex: string;
+    blockHash: string;
+    blockNumber: string;
+    from: string;
+    to: string | null;
+    cumulativeGasUsed: string;
+    gasUsed: string;
+    contractAddress: string | null;
+    logs: Array<{
+        address: string;
+        topics: string[];
+        data: string;
+        blockNumber: string;
+        transactionHash: string;
+        transactionIndex: string;
+        blockHash: string;
+        logIndex: string;
+        removed: boolean;
+    }>;
+    logsBloom: string;
+    status: string; // '0x1' for success, '0x0' for failure
+    effectiveGasPrice: string;
+    type: string;
+}
+
 export type StateSubscriber = (state: SessionKeyState) => void;
 
 export interface SessionKeyStore {
@@ -51,6 +78,7 @@ export interface SessionKeyStore {
     cleanupSessionKey: () => Promise<void>;
     updateBalance: () => Promise<SessionBalanceObject>;
     sendTransaction: (txParams: TransactionParams) => Promise<string>;
+    waitForReceipt: (txHash: string, timeout?: number) => Promise<TransactionReceipt>;
     setWagmiConfig: (config: Config) => void;
 }
 

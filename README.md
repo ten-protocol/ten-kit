@@ -417,6 +417,11 @@ const {
 - `sendTransaction(txParams)`: Send a privacy-preserving transaction through the session key
   - `txParams`: `{ to: string, value: string, data: string }`
   - Returns: `Promise<string>` (transaction hash)
+- `waitForReceipt(txHash, timeout?)`: Wait for transaction receipt and confirmation
+  - `txHash`: Transaction hash from `sendTransaction`
+  - `timeout`: Optional timeout in milliseconds (default: 30000)
+  - Returns: `Promise<TransactionReceipt>` (full receipt with logs and status)
+  - Throws: Error if transaction reverts or timeout is exceeded
 - `createSessionKey()`: Create a new session key
 - `fundSessionKey(address, amount, userAddress)`: Fund a session key with ETH
 - `deleteSessionKey()`: Delete the current session key
@@ -426,10 +431,10 @@ const {
 **Example:**
 ```tsx
 import { useSessionKeyStore } from '@tenprotocol/ten-kit';
-import { encodeFunctionData, parseEther } from 'viem';
+import { encodeFunctionData, parseEther, parseEventLogs } from 'viem';
 
 function MyComponent() {
-  const { sessionKey, sendTransaction } = useSessionKeyStore();
+  const { sessionKey, sendTransaction, waitForReceipt } = useSessionKeyStore();
 
   const handleTransaction = async () => {
     const data = encodeFunctionData({
@@ -442,6 +447,17 @@ function MyComponent() {
       value: `0x${parseEther('0.01').toString(16)}`,
       data,
     });
+
+    // Wait for confirmation and get receipt
+    const receipt = await waitForReceipt(txHash);
+    console.log('Status:', receipt.status);
+    
+    // Parse event logs
+    const events = parseEventLogs({
+      abi: MyContractABI,
+      logs: receipt.logs,
+    });
+    console.log('Events:', events);
   };
 
   return <button onClick={handleTransaction}>Send TX</button>;
@@ -624,6 +640,7 @@ import type {
   // Session Key Types
   SessionKeyStore,
   TransactionParams,
+  TransactionReceipt,
   
   // Public Clients
   TENPublicClients,
@@ -639,6 +656,12 @@ const txParams: TransactionParams = {
   value: '0x0',
   data: '0x...',
 };
+
+// Example: Working with receipts
+const receipt: TransactionReceipt = await waitForReceipt(txHash);
+console.log('Status:', receipt.status);
+console.log('Gas used:', receipt.gasUsed);
+console.log('Logs:', receipt.logs);
 
 // Example: Custom Config
 const config: TenConfig = {
