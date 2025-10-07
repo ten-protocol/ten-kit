@@ -263,7 +263,6 @@ interface TENProviderProps {
   children: ReactNode;
   config?: TenConfig;
   queryClient?: QueryClient;
-  enableSepolia?: boolean;
 }
 ```
 
@@ -300,7 +299,7 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <TENProvider queryClient={queryClient} enableSepolia={true}>
+    <TENProvider queryClient={queryClient}>
       <YourDappContent />
     </TENProvider>
   );

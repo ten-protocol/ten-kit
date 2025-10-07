@@ -3,9 +3,9 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import { WagmiProvider, createConfig } from 'wagmi';
 import { defineChain, http } from 'viem';
 import { injected, unstable_connector, fallback } from 'wagmi';
-import { sepolia } from 'viem/chains';
 import { DEFAULT_TEN_CONFIG } from '@/lib/constants';
 import type { TenConfig } from '@/lib/types';
+import {useSessionKeyStore} from "@/stores/sessionKey.store";
 
 const defaultQueryClient = new QueryClient();
 
@@ -13,26 +13,17 @@ export interface TenProviderProps {
     children: ReactNode;
     config?: TenConfig;
     queryClient?: QueryClient;
-    enableSepolia?: boolean;
 }
 
 export function TENProvider({
     children, 
     config = DEFAULT_TEN_CONFIG,
-    queryClient = defaultQueryClient,
-    enableSepolia = false
+    queryClient = defaultQueryClient
 }: TenProviderProps) {
+    const {setWagmiConfig} = useSessionKeyStore.getState()
     const tenChain = defineChain(config);
-    
-    const transports = enableSepolia 
-        ? {
-            [tenChain.id]: fallback([
-                unstable_connector(injected),
-                http(config.rpcUrls.default.http[0] || 'https://testnet-rpc.ten.xyz/v1/'),
-            ]),
-            [sepolia.id]: http(),
-        }
-        : {
+
+    const transports = {
             [tenChain.id]: fallback([
                 unstable_connector(injected),
                 http(config.rpcUrls.default.http[0] || 'https://testnet-rpc.ten.xyz/v1/'),
@@ -40,11 +31,12 @@ export function TENProvider({
         };
 
     const wagmiConfig = createConfig({
-        chains: enableSepolia ? [sepolia, tenChain] : [tenChain],
-        ssr: true,
+        chains: [tenChain],
         connectors: [injected()],
         transports,
     });
+
+    setWagmiConfig(wagmiConfig);
 
     return (
         <WagmiProvider config={wagmiConfig}>

@@ -1,3 +1,5 @@
+import {Config} from "wagmi";
+
 export interface SessionKeyState {
     sessionKey: string | null;
     isActive: boolean;
@@ -37,6 +39,7 @@ export interface SessionKeyStore {
     isLoading: boolean;
     error: Error | null;
     provider: EIP1193Provider | null,
+    wagmiConfig: null|Config
 
     // Actions
     initSession: (provider: EIP1193Provider) => void;
@@ -48,6 +51,7 @@ export interface SessionKeyStore {
     cleanupSessionKey: () => Promise<void>;
     updateBalance: () => Promise<SessionBalanceObject>;
     sendTransaction: (txParams: TransactionParams) => Promise<string>;
+    setWagmiConfig: (config: Config) => void;
 }
 
 export interface TenConfig {

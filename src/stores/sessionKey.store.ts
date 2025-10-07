@@ -25,6 +25,7 @@ const initialState = {
     balance: null,
     isLoading: false,
     error: null,
+    wagmiConfig: null
 };
 
 const providerCleanupRef = { current: null as (() => void) | null };
@@ -407,6 +408,9 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                 }
             },
 
+            setWagmiConfig: (wagmiConfig) => {
+                set({wagmiConfig});
+            }
         }),
         {
             name: 'ten-session-key-state',

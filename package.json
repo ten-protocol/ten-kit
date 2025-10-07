@@ -1,6 +1,6 @@
 {
   "name": "@tenprotocol/ten-kit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "description": "React components and hooks for connecting dapps to TEN Protocol",
   "main": "dist/index.js",
