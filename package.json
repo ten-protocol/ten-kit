@@ -22,7 +22,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
+    "build": "tsc --emitDeclarationOnly && NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
