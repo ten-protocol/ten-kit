@@ -1,7 +1,11 @@
 // Import styles
 import './styles/globals.css';
 
-// Main Provider
+
+// TEN Config
+export {tenChain, TENWagmiConfig, TENTransports } from "@/lib/tenConfig";
+
+// Deprecated - No longer recommended to use this provider
 export { TENProvider } from '@/components/TENProvider/TENProvider';
 export type { TenProviderProps } from '@/components/TENProvider/TENProvider';
 

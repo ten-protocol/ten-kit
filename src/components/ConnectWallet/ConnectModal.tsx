@@ -113,7 +113,7 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
                     </DialogDescription>
                 </DialogHeader>
 
-                <Alert variant="default" className="mt-2 border-white/50">
+                <Alert variant="default" className="mt-2 border-foreground/10">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Heads up!</AlertTitle>
                     <AlertDescription>

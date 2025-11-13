@@ -50,62 +50,58 @@ export default function ConnectWalletButton({
     }, [chain, isWrongChain, onChainChange]);
 
     return (
-        <div className={`w-full max-w-md flex justify-center ${className || ''}`}>
-            <div className="w-full flex justify-end">
-                {!isConnected ? (
-                    <>
-                        <Button
-                            onClick={() => setIsConnectModalOpen(true)}
-                            className="bg-primary hover:bg-primary/90"
-                        >
-                            Connect Wallet
-                        </Button>
-                        <ConnectModal
-                            isOpen={isConnectModalOpen}
-                            onOpenChange={setIsConnectModalOpen}
-                            gatewayUrl={gatewayUrl}
-                        />
-                    </>
-                ) : (
-                    <>
-                        {isWrongChain ? (
-                            <div className="flex gap-2 items-start">
-                                <Button
-                                    size="sm"
-                                    className="bg-destructive hover:bg-destructive/90"
-                                    onClick={() => setIsSettingsOpen(true)}
-                                >
-                                    SWITCH CHAIN
-                                </Button>
-                            </div>
-                        ) : (
+        <div className="ten-connect">
+            {!isConnected ? (
+                <>
+                    <Button
+                        onClick={() => setIsConnectModalOpen(true)}
+                        className={`bg-primary hover:bg-primary/90 ${className}`}
+                    >
+                        Connect Wallet
+                    </Button>
+                    <ConnectModal
+                        isOpen={isConnectModalOpen}
+                        onOpenChange={setIsConnectModalOpen}
+                        gatewayUrl={gatewayUrl}
+                    />
+                </>
+            ) : (
+                <>
+                    {isWrongChain ? (
                             <Button
-                                className="bg-primary hover:bg-primary/90 flex flex-col items-center justify-center lg:py-2 gap-0"
+                                size="sm"
+                                className="bg-destructive hover:bg-destructive/90"
                                 onClick={() => setIsSettingsOpen(true)}
                             >
-                                <span className="text-xs">
-                                    {address?.slice(0, 6)}...{address?.slice(-4)}
-                                </span>
-                                <div className="hidden md:flex gap-2 items-center text-xs text-primary-foreground/80">
-                                    {isLoadingEthBalance ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <span>
-                                            {ethBalance?.formatted?.slice(0, 6) || '0'}{' '}
-                                            {ethBalance?.symbol}
-                                        </span>
-                                    )}
-                                </div>
+                                SWITCH CHAIN
                             </Button>
-                        )}
-                        <WalletSettingsModal
-                            isOpen={isSettingsOpen}
-                            onOpenChange={setIsSettingsOpen}
-                            gatewayUrl={gatewayUrl}
-                        />
-                    </>
-                )}
-            </div>
+                    ) : (
+                        <Button
+                            className="bg-primary hover:bg-primary/90 flex flex-col items-center justify-center lg:py-2 gap-0"
+                            onClick={() => setIsSettingsOpen(true)}
+                        >
+                            <span className="text-xs">
+                                {address?.slice(0, 6)}...{address?.slice(-4)}
+                            </span>
+                            <div className="hidden md:flex gap-2 items-center text-xs text-primary-foreground/80">
+                                {isLoadingEthBalance ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                    <span>
+                                        {ethBalance?.formatted?.slice(0, 6) || '0'}{' '}
+                                        {ethBalance?.symbol}
+                                    </span>
+                                )}
+                            </div>
+                        </Button>
+                    )}
+                    <WalletSettingsModal
+                        isOpen={isSettingsOpen}
+                        onOpenChange={setIsSettingsOpen}
+                        gatewayUrl={gatewayUrl}
+                    />
+                </>
+            )}
         </div>
     );
 }

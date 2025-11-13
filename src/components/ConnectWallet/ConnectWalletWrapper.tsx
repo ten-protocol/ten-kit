@@ -31,7 +31,7 @@ export default function ConnectWalletWrapper({
 
     if (showContent && errorState) {
         return (
-            <div className="flex flex-col gap-2 my-6 text-center items-center">
+            <div className="ten-connect flex flex-col gap-2 my-6 text-center items-center">
                 <h3 className="text-xl">Error fetching contract data</h3>
                 <p className="mb-4 opacity-90">
                     This may be because your access token has been revoked or has expired (this will
@@ -49,7 +49,7 @@ export default function ConnectWalletWrapper({
 
     if (showContent) {
         return (
-            <div className={containerClasses}>
+            <div className={cn('ten-connect', containerClasses)}>
                 {children}
                 {loading && (
                     <div className="h-[3px] my-[25px] overflow-hidden relative">
@@ -63,7 +63,7 @@ export default function ConnectWalletWrapper({
     return (
         <div
             className={cn(
-                'flex flex-col items-center justify-center gap-4 p-4 text-center',
+                'ten-connect flex flex-col items-center justify-center gap-4 p-4 text-center',
                 className
             )}
         >

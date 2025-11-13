@@ -1,6 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
+import esbuild from 'rollup-plugin-esbuild';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
 import dts from 'rollup-plugin-dts';
@@ -38,14 +38,24 @@ export default [
           { find: '@', replacement: path.resolve(__dirname, 'src') }
         ]
       }),
+      esbuild({
+        include: /\.[jt]sx?$/,
+        exclude: /node_modules/,
+        target: 'es2020',
+        jsx: 'transform',
+        jsxFactory: 'React.createElement',
+        jsxFragment: 'React.Fragment',
+        tsconfig: './tsconfig.json',
+        loaders: {
+          '.json': 'json',
+          '.js': 'jsx',
+        },
+      }),
       resolve({
         browser: true,
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       }),
       commonjs(),
-      typescript({
-        tsconfig: './tsconfig.json',
-        exclude: ['**/*.stories.*', '**/*.test.*'],
-      }),
       postcss({
         extract: true,
         minimize: true,

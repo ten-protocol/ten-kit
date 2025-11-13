@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  important: ':is(.ten-connect, .ten-connect *)',
+  corePlugins: {
+    preflight: false,
+  },
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
     ...(process.env.NODE_ENV !== 'production' ? ['./stories/**/*.{js,ts,jsx,tsx}'] : []),

@@ -1,6 +1,6 @@
 {
   "name": "@tenprotocol/ten-kit",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "description": "React components and hooks for connecting dapps to TEN Protocol",
   "main": "dist/index.js",
@@ -93,6 +93,7 @@
     "postcss-cli": "^11.0.0",
     "rollup": "^4.0.0",
     "rollup-plugin-dts": "^6.0.0",
+    "rollup-plugin-esbuild": "^6.2.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "storybook": "^7.0.0",

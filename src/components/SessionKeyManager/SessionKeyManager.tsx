@@ -81,41 +81,43 @@ export default function SessionKeyManager() {
     };
 
     return (
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-            <DialogTrigger asChild>{renderTriggerButton()}</DialogTrigger>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Session Key Manager</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-6">
-                    {error && (
-                        <Alert variant="destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>Error</AlertTitle>
-                            <AlertDescription>{error.message}</AlertDescription>
-                        </Alert>
-                    )}
+        <div className="ten-connect">
+            <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+                <DialogTrigger asChild>{renderTriggerButton()}</DialogTrigger>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Session Key Manager</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6">
+                        {error && (
+                            <Alert variant="destructive">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertTitle>Error</AlertTitle>
+                                <AlertDescription>{error.message}</AlertDescription>
+                            </Alert>
+                        )}
 
-                    {isLoading && (
-                        <Alert>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            <AlertTitle>Processing</AlertTitle>
-                            <AlertDescription>
-                                Please wait while we process your request...
-                            </AlertDescription>
-                        </Alert>
-                    )}
+                        {isLoading && (
+                            <Alert>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <AlertTitle>Processing</AlertTitle>
+                                <AlertDescription>
+                                    Please wait while we process your request...
+                                </AlertDescription>
+                            </Alert>
+                        )}
 
-                    {deletionState === DeletionState.IDLE && (
-                        <div className="space-y-4">
-                            <SessionKeyInfo />
-                            <SessionKeyFunding />
-                            <SessionKeyTrash />
-                        </div>
-                    )}
-                    {deletionState !== DeletionState.IDLE && <SessionKeyTrashProgress />}
-                </div>
-            </DialogContent>
-        </Dialog>
+                        {deletionState === DeletionState.IDLE && (
+                            <div className="space-y-4">
+                                <SessionKeyInfo />
+                                <SessionKeyFunding />
+                                <SessionKeyTrash />
+                            </div>
+                        )}
+                        {deletionState !== DeletionState.IDLE && <SessionKeyTrashProgress />}
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 }

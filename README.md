@@ -39,12 +39,12 @@ pnpm add react react-dom wagmi viem @tanstack/react-query zustand
 **Required versions:**
 - `react` >= 16.8.0
 - `react-dom` >= 16.8.0
-- **`wagmi` ^2.0.0** - Core Ethereum hooks library (automatically configured for TEN)
+- **`wagmi` ^2.0.0** - Core Ethereum hooks library (you'll configure with `TENWagmiConfig`)
 - **`viem` ^2.0.0** - Ethereum utilities used by wagmi
 - **`@tanstack/react-query` ^5.0.0** - Data fetching library used by wagmi
 - `zustand` ^4.4.0 - State management for session keys
 
-> **Note:** `TENProvider` includes `WagmiProvider` and `QueryClientProvider`, so you don't need to set these up separately. The library handles all wagmi configuration for TEN Protocol automatically.
+> **Note:** The library exports `TENWagmiConfig` for easy wagmi setup. You'll need to wrap your app with `WagmiProvider` and `QueryClientProvider` as shown in the Quick Start examples.
 
 ### CSS Import
 
@@ -60,22 +60,29 @@ This CSS file includes all the necessary styles for the components, including Ta
 
 This library is built on top of [wagmi](https://wagmi.sh/) and provides:
 
-**Pre-configured wagmi setup** for TEN Protocol - no manual wagmi config needed  
+**Pre-configured wagmi setup** for TEN Protocol - `TENWagmiConfig` ready to use  
 **All wagmi hooks available** - use `useAccount`, `useBalance`, `useReadContract`, etc.  
-**WagmiProvider and QueryClientProvider** - automatically wrapped by `TENProvider`  
-**Custom connectors** - includes injected wallet connector with TEN Protocol support
+**Custom connectors** - includes injected wallet connector with TEN Protocol support  
+**TEN Chain configuration** - pre-configured chain and transport settings
 
-**You don't need to set up wagmi separately** - just wrap your app with `TENProvider` and you're ready to use any wagmi hook alongside TEN-specific features.
+**Setup is simple** - just create your wagmi config with `TENWagmiConfig` and wrap your app with `WagmiProvider` and `QueryClientProvider`:
 
 ```tsx
-import { TENProvider, useSessionKeyStore } from '@tenprotocol/ten-kit';
-import { useAccount, useBalance } from 'wagmi'; // wagmi hooks work out of the box!
+import { TENWagmiConfig, useSessionKeyStore } from '@tenprotocol/ten-kit';
+import { useAccount } from 'wagmi';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 function MyApp() {
   return (
-    <TENProvider>
-      <MyComponent />
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <MyComponent />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 
@@ -94,19 +101,26 @@ The simplest setup - just wallet connection without session keys:
 
 ```tsx
 import React from 'react';
-import { TENProvider, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { TENWagmiConfig, ConnectWalletButton } from '@tenprotocol/ten-kit';
 import { useAccount } from 'wagmi';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 const MyDApp = () => (
-  <TENProvider>
-    <div className="p-8 max-w-md mx-auto">
-      <header className="flex flex-col justify-center items-center">
-        <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
-        <ConnectWalletButton />
-      </header>
-      <AppContent />
-    </div>
-  </TENProvider>
+  <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <div className="p-8 max-w-md mx-auto">
+        <header className="flex flex-col justify-center items-center">
+          <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
+          <ConnectWalletButton />
+        </header>
+        <AppContent />
+      </div>
+    </QueryClientProvider>
+  </WagmiProvider>
 );
 
 const AppContent = () => {
@@ -139,26 +153,33 @@ For privacy-preserving transactions, add the `SessionKeyManager` component:
 ```tsx
 import React from 'react';
 import { 
-  TENProvider, 
+  TENWagmiConfig,
   ConnectWalletButton, 
   SessionKeyManager,
   useSessionKeyStore 
 } from '@tenprotocol/ten-kit';
 import { useAccount } from 'wagmi';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 const MyDApp = () => (
-  <TENProvider>
-    <div className="p-8 max-w-md mx-auto">
-      <header className="flex flex-col justify-center items-center">
-        <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
-        <div className="flex gap-4 justify-center mb-6">
-          <ConnectWalletButton />
-          <SessionKeyManager />
-        </div>
-      </header>
-      <AppContent />
-    </div>
-  </TENProvider>
+  <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <div className="p-8 max-w-md mx-auto">
+        <header className="flex flex-col justify-center items-center">
+          <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
+          <div className="flex gap-4 justify-center mb-6">
+            <ConnectWalletButton />
+            <SessionKeyManager />
+          </div>
+        </header>
+        <AppContent />
+      </div>
+    </QueryClientProvider>
+  </WagmiProvider>
 );
 
 const AppContent = () => {
@@ -247,46 +268,40 @@ const MyContractComponent = () => {
 
 ### Components
 
-#### `TENProvider`
+#### Wagmi Configuration
 
-The main provider component that sets up wagmi and React Query for TEN Protocol.
+The library exports `TENWagmiConfig` which provides a pre-configured wagmi setup for TEN Protocol.
 
-**What it does:**
-- Wraps your app with `WagmiProvider` configured for TEN Protocol
-- Wraps your app with `QueryClientProvider` for data fetching
-- Configures injected wallet connector (MetaMask, Rabby, etc.)
-- Sets up TEN Protocol chain configuration
-- Enables all wagmi hooks to work with TEN Protocol
-
-```tsx
-interface TENProviderProps {
-  children: ReactNode;
-  config?: TenConfig;
-  queryClient?: QueryClient;
-}
-```
-
-**Props:**
-- `children`: Your app content
-- `config`: Custom TEN Protocol chain configuration (optional)
-- `queryClient`: Custom React Query client instance (optional)
+**What it includes:**
+- TEN Protocol chain configuration
+- Injected wallet connector (MetaMask, Rabby, etc.)
+- Transport configuration with fallback support
+- All necessary settings to work with TEN Protocol
 
 **Basic Usage:**
 ```tsx
-import { TENProvider } from '@tenprotocol/ten-kit';
+import { TENWagmiConfig } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <TENProvider>
-      <YourDappContent />
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <YourDappContent />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```
 
 **Advanced Usage with Custom QueryClient:**
 ```tsx
-import { TENProvider } from '@tenprotocol/ten-kit';
+import { TENWagmiConfig } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
 import { QueryClient } from '@tanstack/react-query';
 
 const queryClient = new QueryClient({
@@ -297,11 +312,41 @@ const queryClient = new QueryClient({
   },
 });
 
+const config = createConfig(TENWagmiConfig);
+
 function App() {
   return (
-    <TENProvider queryClient={queryClient}>
-      <YourDappContent />
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <YourDappContent />
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+```
+
+**Customizing the Configuration:**
+```tsx
+import { TENWagmiConfig, tenChain, TENTransports } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { injected, walletConnect } from 'wagmi/connectors';
+
+// Extend the default config with additional connectors
+const config = createConfig({
+  ...TENWagmiConfig,
+  connectors: [
+    injected(),
+    walletConnect({ projectId: 'YOUR_PROJECT_ID' }),
+  ],
+});
+
+function App() {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <YourDappContent />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```
@@ -493,6 +538,9 @@ import {
   TEN_CHAIN_ID,
   DEFAULT_GATEWAY_URL,
   DEFAULT_TEN_CONFIG,
+  tenChain,
+  TENWagmiConfig,
+  TENTransports,
 } from '@ten-protocol/ten-kit';
 ```
 
@@ -630,9 +678,6 @@ This package is written in TypeScript and exports all necessary types:
 
 ```tsx
 import type {
-  // Provider Props
-  TenProviderProps,
-  
   // Component Props
   ConnectWalletButtonProps,
   ConnectWalletWrapperProps,
@@ -662,13 +707,6 @@ const receipt: TransactionReceipt = await waitForReceipt(txHash);
 console.log('Status:', receipt.status);
 console.log('Gas used:', receipt.gasUsed);
 console.log('Logs:', receipt.logs);
-
-// Example: Custom Config
-const config: TenConfig = {
-  id: 8443,
-  name: 'TEN Protocol',
-  // ...
-};
 ```
 
 ## Styling
@@ -757,17 +795,21 @@ export default function RootLayout({ children }) {
 // app/providers.tsx
 'use client';
 
-import { TENProvider } from '@tenprotocol/ten-kit';
-import { QueryClient } from '@tanstack/react-query';
+import { TENWagmiConfig } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 
+const config = createConfig(TENWagmiConfig);
 const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <TENProvider queryClient={queryClient}>
-      {children}
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```
@@ -777,7 +819,9 @@ export default function Providers({ children }: { children: ReactNode }) {
 Since this library is built on wagmi, you can use any wagmi hook alongside TEN-specific features:
 
 ```tsx
-import { TENProvider, useSessionKeyStore, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { TENWagmiConfig, useSessionKeyStore, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { 
   useAccount, 
   useBalance, 
@@ -785,6 +829,9 @@ import {
   useReadContract,
   useWatchBlockNumber 
 } from 'wagmi';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 function MyComponent() {
   // Wagmi hooks work out of the box
@@ -815,10 +862,12 @@ function MyComponent() {
 
 function App() {
   return (
-    <TENProvider>
-      <ConnectWalletButton />
-      <MyComponent />
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <ConnectWalletButton />
+        <MyComponent />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```
@@ -1117,13 +1166,17 @@ const unwatchEvents = clients.websocketClient.watchContractEvent({
 
 ### Custom TEN Configuration
 
-You can provide a custom configuration for different TEN networks:
+You can customize the TEN configuration for different networks:
 
 ```tsx
-import { TENProvider } from '@tenprotocol/ten-kit';
-import { QueryClient } from '@tanstack/react-query';
+import { TENWagmiConfig, TENTransports } from '@tenprotocol/ten-kit';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { defineChain, http, fallback } from 'viem';
+import { injected, unstable_connector } from 'wagmi';
 
-const customConfig = {
+// Define a custom TEN chain
+const customTenChain = defineChain({
   id: 8443,
   name: 'Custom TEN Network',
   nativeCurrency: {
@@ -1136,15 +1189,32 @@ const customConfig = {
       http: ['https://your-custom-rpc.com'],
     },
   },
+});
+
+// Create custom transports
+const customTransports = {
+  [customTenChain.id]: fallback([
+    unstable_connector(injected),
+    http('https://your-custom-rpc.com'),
+  ]),
 };
+
+// Create wagmi config with custom settings
+const config = createConfig({
+  chains: [customTenChain],
+  connectors: [injected()],
+  transports: customTransports,
+});
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <TENProvider config={customConfig} queryClient={queryClient}>
-      <YourApp />
-    </TENProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <YourApp />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```

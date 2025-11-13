@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react';
-import '../src/styles/globals.css';
+import '../dist/index.css'; // Import the built, scoped CSS instead of source
 
 const preview: Preview = {
   parameters: {

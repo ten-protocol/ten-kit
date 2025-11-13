@@ -1,13 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { 
-    TENProvider,
+    TENWagmiConfig,
     ConnectWalletButton} from '../src/index';
 import {useAccount} from "wagmi";
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 // Simple minimal usage example
 const WalletOnlyExample = () => (
-    <TENProvider>
+    <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
             <div className="p-8 max-w-md mx-auto bg-white rounded-lg shadow-lg">
                 <header className="flex flex-col justify-center items-center">
                     <h1 className="text-2xl font-bold mb-4 text-center">My TEN dApp</h1>
@@ -17,7 +23,8 @@ const WalletOnlyExample = () => (
                 </header>
                 <ExampleContent/>
             </div>
-    </TENProvider>
+        </QueryClientProvider>
+    </WagmiProvider>
 );
 
 const ExampleContent = () => {
@@ -73,21 +80,28 @@ export const Default: Story = {
             },
             source: {
                 code: `import React from 'react';
-import { TENProvider, ConnectWalletButton } from '@ten-protocol/ten-kit';
+import { TENWagmiConfig, ConnectWalletButton } from '@ten-protocol/ten-kit';
 import { useAccount } from 'wagmi';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const config = createConfig(TENWagmiConfig);
+const queryClient = new QueryClient();
 
 const WalletOnlyExample = () => (
-    <TENProvider>
-        <div className="p-8 max-w-md mx-auto bg-white rounded-lg shadow-lg">
-            <header className="flex flex-col justify-center items-center">
-                <h1 className="text-2xl font-bold mb-4 text-center">My TEN dApp</h1>
-                <div className="flex gap-4 justify-center mb-6">
-                    <ConnectWalletButton />
-                </div>
-            </header>
-            <ExampleContent />
-        </div>
-    </TENProvider>
+    <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+            <div className="p-8 max-w-md mx-auto bg-white rounded-lg shadow-lg">
+                <header className="flex flex-col justify-center items-center">
+                    <h1 className="text-2xl font-bold mb-4 text-center">My TEN dApp</h1>
+                    <div className="flex gap-4 justify-center mb-6">
+                        <ConnectWalletButton />
+                    </div>
+                </header>
+                <ExampleContent />
+            </div>
+        </QueryClientProvider>
+    </WagmiProvider>
 );
 
 const ExampleContent = () => {
