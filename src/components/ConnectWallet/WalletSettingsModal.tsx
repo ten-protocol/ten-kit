@@ -152,17 +152,17 @@ export default function WalletSettingsModal({
                         Manage your wallet connection and network settings
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <h4 className="font-medium">Current Network</h4>
-                        <p className="text-sm text-muted-foreground">
+                <div className="tc-space-y-4">
+                    <div className="tc-space-y-2">
+                        <h4 className="tc-font-medium">Current Network</h4>
+                        <p className="tc-text-sm tc-text-muted-foreground">
                             {chain?.name || 'Unknown Network'} (ID: {chain?.id})
                         </p>
                         {isWrongChain && (
-                            <div className="space-y-2">
+                            <div className="tc-space-y-2">
                                 {isCheckingChain ? (
                                     <Alert>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Loader2 className="tc-h-4 tc-w-4 tc-animate-spin" />
                                         <AlertTitle>Checking network...</AlertTitle>
                                         <AlertDescription>
                                             Verifying if TEN Protocol is available in your wallet.
@@ -171,15 +171,15 @@ export default function WalletSettingsModal({
                                 ) : chainExists === false ? (
                                     <>
                                         <Alert variant="destructive">
-                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertCircle className="tc-h-4 tc-w-4" />
                                             <AlertTitle>Chain not found in wallet.</AlertTitle>
                                             <AlertDescription>
                                                 Before you can use dApps on TEN Protocol you first have to add the chain to your wallet via the TEN Gateway.
                                             </AlertDescription>
-                                            <Button asChild className="w-full mt-4">
+                                            <Button asChild className="tc-w-full tc-mt-4">
                                                 <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
                                                     Add TEN via Gateway{' '}
-                                                    <ExternalLink className="ml-2 w-4 h-4" />
+                                                    <ExternalLink className="tc-ml-2 tc-w-4 tc-h-4" />
                                                 </a>
                                             </Button>
                                         </Alert>
@@ -188,7 +188,7 @@ export default function WalletSettingsModal({
                                 ) : chainExists === true ? (
                                     <>
                                         <Alert variant="destructive">
-                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertCircle className="tc-h-4 tc-w-4" />
                                             <AlertTitle>Wrong Network</AlertTitle>
                                             <AlertDescription>
                                                 You are on the wrong network. Click below to switch to TEN Protocol.
@@ -196,12 +196,12 @@ export default function WalletSettingsModal({
                                         </Alert>
                                         <Button
                                             onClick={handleSwitchChain}
-                                            className="w-full"
+                                            className="tc-w-full"
                                             disabled={isSwitchingChain}
                                         >
                                             {isSwitchingChain ? (
                                                 <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />
                                                     Switching...
                                                 </>
                                             ) : (
@@ -212,26 +212,26 @@ export default function WalletSettingsModal({
                                 ) : (
                                     <>
                                         <Alert variant="destructive">
-                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertCircle className="tc-h-4 tc-w-4" />
                                             <AlertTitle>Wrong Network</AlertTitle>
                                             <AlertDescription>
                                                 You are on the wrong network. Please make sure you have added TEN Protocol to your wallet via the TEN Gateway.
                                             </AlertDescription>
                                         </Alert>
-                                        <Button asChild variant="outline" className="w-full">
+                                        <Button asChild variant="outline" className="tc-w-full">
                                             <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
                                                 Add TEN to Wallet (Gateway){' '}
-                                                <ExternalLink className="ml-2 w-4 h-4" />
+                                                <ExternalLink className="tc-ml-2 tc-w-4 tc-h-4" />
                                             </a>
                                         </Button>
                                         <Button
                                             onClick={handleSwitchChain}
-                                            className="w-full"
+                                            className="tc-w-full"
                                             disabled={isSwitchingChain}
                                         >
                                             {isSwitchingChain ? (
                                                 <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />
                                                     Switching...
                                                 </>
                                             ) : (
@@ -244,20 +244,20 @@ export default function WalletSettingsModal({
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <h4 className="font-medium">Connected Account</h4>
-                        <p className="text-sm text-muted-foreground break-all">{address}</p>
+                    <div className="tc-space-y-2">
+                        <h4 className="tc-font-medium">Connected Account</h4>
+                        <p className="tc-text-sm tc-text-muted-foreground tc-break-all">{address}</p>
                     </div>
 
-                    <div className="space-y-3">
-                        <h4 className="font-medium">Balances</h4>
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center">
+                    <div className="tc-space-y-3">
+                        <h4 className="tc-font-medium">Balances</h4>
+                        <div className="tc-space-y-2">
+                            <div className="tc-flex tc-justify-between tc-items-center">
                                 <span>ETH:</span>
                                 {isLoadingEthBalance ? (
-                                    <Skeleton className="w-24 h-5" />
+                                    <Skeleton className="tc-w-24 tc-h-5" />
                                 ) : (
-                                    <span className="font-medium">
+                                    <span className="tc-font-medium">
                                         {ethBalance?.formatted || '0'} {ethBalance?.symbol || 'ETH'}
                                     </span>
                                 )}
@@ -265,14 +265,14 @@ export default function WalletSettingsModal({
                         </div>
                     </div>
 
-                    <div className="pt-4">
+                    <div className="tc-pt-4">
                         <Button
                             onClick={() => {
                                 disconnect();
                                 onOpenChange(false);
                             }}
                             variant="destructive"
-                            className="w-full"
+                            className="tc-w-full"
                         >
                             Disconnect Wallet
                         </Button>

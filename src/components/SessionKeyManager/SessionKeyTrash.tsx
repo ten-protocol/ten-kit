@@ -39,10 +39,10 @@ export default function SessionKeyTrash() {
 
     return (
         <>
-            <div className="space-y-3">
+            <div className="tc-space-y-3">
                 <Separator />
-                <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Withdraw funds & Delete key</h4>
+                <div className="tc-space-y-2">
+                    <h4 className="tc-text-sm tc-font-medium">Withdraw funds & Delete key</h4>
                     <Button onClick={handleDeleteSession} disabled={isLoading} variant="outline">
                         Delete Session
                     </Button>
@@ -65,9 +65,9 @@ export default function SessionKeyTrash() {
                         <AlertDialogAction
                             onClick={handleConfirmDeleteSession}
                             disabled={isLoading}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="tc-bg-destructive tc-text-destructive-foreground hover:tc-bg-destructive/90"
                         >
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isLoading && <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />}
                             Delete Session
                         </AlertDialogAction>
                     </AlertDialogFooter>

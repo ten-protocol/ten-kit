@@ -47,13 +47,13 @@ function TooltipContent({
                     data-slot="tooltip-content"
                     sideOffset={sideOffset}
                     className={cn(
-                        "bg-foreground text-background animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",
+                        "tc-bg-foreground tc-text-background tc-animate-in tc-fade-in-0 tc-zoom-in-95 data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=closed]:tc-zoom-out-95 data-[side=bottom]:tc-slide-in-from-top-2 data-[side=left]:tc-slide-in-from-right-2 data-[side=right]:tc-slide-in-from-left-2 data-[side=top]:tc-slide-in-from-bottom-2 tc-z-50 tc-w-fit tc-origin-(--radix-tooltip-content-transform-origin) tc-rounded-md tc-px-3 tc-py-1.5 tc-text-xs tc-text-balance",
                         className
                     )}
                     {...props}
                 >
                     {children}
-                    <TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
+                    <TooltipPrimitive.Arrow className="tc-bg-foreground tc-fill-foreground tc-z-50 tc-size-2.5 tc-translate-y-[calc(-50%_-_2px)] tc-rotate-45 tc-rounded-[2px]" />
                 </TooltipPrimitive.Content>
             </div>
         </TooltipPrimitive.Portal>

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  important: ':is(.ten-connect, .ten-connect *)',
+  prefix: 'tc-',
   corePlugins: {
     preflight: false,
   },
@@ -11,46 +11,46 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: 'hsl(var(--tc-border))',
+        input: 'hsl(var(--tc-input))',
+        ring: 'hsl(var(--tc-ring))',
+        background: 'hsl(var(--tc-background))',
+        foreground: 'hsl(var(--tc-foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'hsl(var(--tc-primary))',
+          foreground: 'hsl(var(--tc-primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'hsl(var(--tc-secondary))',
+          foreground: 'hsl(var(--tc-secondary-foreground))',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: 'hsl(var(--tc-destructive))',
+          foreground: 'hsl(var(--tc-destructive-foreground))',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'hsl(var(--tc-muted))',
+          foreground: 'hsl(var(--tc-muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'hsl(var(--tc-accent))',
+          foreground: 'hsl(var(--tc-accent-foreground))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: 'hsl(var(--tc-popover))',
+          foreground: 'hsl(var(--tc-popover-foreground))',
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: 'hsl(var(--tc-card))',
+          foreground: 'hsl(var(--tc-card-foreground))',
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: 'var(--tc-radius)',
+        md: 'calc(var(--tc-radius) - 2px)',
+        sm: 'calc(var(--tc-radius) - 4px)',
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };

@@ -19,7 +19,7 @@ export default function ConnectWalletListItem({ connector, supported, onClick }:
     return (
         <Button
             variant="outline"
-            className="w-full justify-start gap-4 h-14 relative"
+            className="tc-w-full tc-justify-start tc-gap-4 tc-relative"
             onClick={handleClick}
             disabled={!supported}
         >
@@ -30,17 +30,17 @@ export default function ConnectWalletListItem({ connector, supported, onClick }:
                         height={48}
                         width={48}
                         alt={connector.name}
-                        className="w-[32px]"
+                        className="tc-w-[32px]"
                     />
                 ) : (
-                    <Wallet className="h-6 w-6" />
+                    <Wallet className="tc-h-6 tc-w-6" />
                 )}
             </div>
-            <div className="flex flex-col items-start flex-grow">
-                <span className="font-medium">
+            <div className="tc-flex tc-flex-col tc-items-start tc-flex-grow">
+                <span className="tc-font-medium">
                     {connector.name === 'Injected' ? 'Browser Wallet' : connector.name}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="tc-text-sm tc-text-muted-foreground">
                     {connector.type === 'injected' ? 'Browser Extension' : connector.type}
                 </span>
             </div>

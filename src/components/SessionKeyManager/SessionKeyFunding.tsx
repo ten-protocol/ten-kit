@@ -174,8 +174,8 @@ export default function SessionKeyFunding() {
     // Start Session
     if (!sessionKey) {
         return (
-            <Button onClick={handleStartSession} disabled={isLoading} className="w-full" size="lg">
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleStartSession} disabled={isLoading} className="tc-w-full" size="lg">
+                {isLoading && <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />}
                 Start Session
             </Button>
         );
@@ -183,25 +183,25 @@ export default function SessionKeyFunding() {
 
     // Fund/withdraw Session
     return (
-        <div className="w-full">
+        <div className="tc-w-full">
             {/* Tab Navigation */}
-            <div className="flex bg-muted rounded-lg p-1 mb-4">
+            <div className="tc-flex tc-bg-muted tc-rounded-lg tc-p-1 tc-mb-4">
                 <button
                     onClick={() => setActiveTab('fund')}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`tc-flex-1 tc-px-3 tc-py-2 tc-text-sm tc-font-medium tc-rounded-md tc-transition-colors ${
                         activeTab === 'fund'
-                            ? 'bg-background text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
+                            ? 'tc-bg-background tc-text-foreground tc-shadow-sm'
+                            : 'tc-text-muted-foreground hover:tc-text-foreground'
                     }`}
                 >
                     Fund
                 </button>
                 <button
                     onClick={() => setActiveTab('withdraw')}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`tc-flex-1 tc-px-3 tc-py-2 tc-text-sm tc-font-medium tc-rounded-md tc-transition-colors ${
                         activeTab === 'withdraw'
-                            ? 'bg-background text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
+                            ? 'tc-bg-background tc-text-foreground tc-shadow-sm'
+                            : 'tc-text-muted-foreground hover:tc-text-foreground'
                     }`}
                 >
                     Withdraw
@@ -210,10 +210,10 @@ export default function SessionKeyFunding() {
 
             {/* Tab Content */}
             {activeTab === 'fund' && (
-                <div className="space-y-2">
+                <div className="tc-space-y-2">
                     <Label htmlFor="fundAmount">Fund Session</Label>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="flex-1 col-span-3">
+                    <div className="tc-grid tc-grid-cols-4 tc-gap-4">
+                        <div className="tc-flex-1 tc-col-span-3">
                         <Input
                             id="fundAmount"
                             type="number"
@@ -222,17 +222,17 @@ export default function SessionKeyFunding() {
                             value={fundAmount}
                             onChange={(e) => setFundAmount(e.target.value)}
                             placeholder="0.01"
-                            className="mb-2"
+                            className="tc-mb-2"
                             disabled={isTransacting}
                         />
                             {/* Quick transfer buttons */}
-                            <div className="flex gap-1">
+                            <div className="tc-flex tc-gap-1">
                                 <Button
                                     onClick={() => setFundAmountPercentage(25)}
                                     disabled={isTransacting || getWalletBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     25%
                                 </Button>
@@ -241,7 +241,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getWalletBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     50%
                                 </Button>
@@ -250,7 +250,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getWalletBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     75%
                                 </Button>
@@ -259,7 +259,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getWalletBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     100%
                                 </Button>
@@ -269,39 +269,39 @@ export default function SessionKeyFunding() {
                             onClick={handleFundSession}
                             disabled={isTransacting || !fundAmount || !!fundError}
                             variant="secondary"
-                            className="col-span-1"
+                            className="tc-col-span-1"
                         >
                             {isTransacting ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />
                             ) : (
                                 'Fund'
                             )}
                         </Button>
                     </div>
 
-                    {fundError && <p className="text-xs text-red-400 absolute">{fundError}</p>}
+                    {fundError && <p className="tc-text-xs tc-text-red-400 tc-absolute">{fundError}</p>}
                 </div>
             )}
 
             {activeTab === 'withdraw' && (
-                <div className="space-y-2">
+                <div className="tc-space-y-2">
                     <Label htmlFor="withdrawAmount">Withdraw From Session</Label>
-                    <div className="space-y-2">
+                    <div className="tc-space-y-2">
                         <Input
                             id="withdrawAddress"
                             type="text"
                             value={withdrawAddress}
                             onChange={(e) => setWithdrawAddress(e.target.value)}
                             placeholder="Recipient address (optional, defaults to your wallet)"
-                            className="w-full"
+                            className="tc-w-full"
                             disabled={isTransacting}
                         />
                         {withdrawAddressError && (
-                            <p className="text-xs text-red-400">{withdrawAddressError}</p>
+                            <p className="tc-text-xs tc-text-red-400">{withdrawAddressError}</p>
                         )}
                     </div>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="flex-1 col-span-3">
+                    <div className="tc-grid tc-grid-cols-4 tc-gap-4">
+                        <div className="tc-flex-1 tc-col-span-3">
                         <Input
                             id="withdrawAmount"
                             type="number"
@@ -310,17 +310,17 @@ export default function SessionKeyFunding() {
                             value={withdrawAmount}
                             onChange={(e) => setWithdrawAmount(e.target.value)}
                             placeholder="0.01"
-                            className="mb-2"
+                            className="tc-mb-2"
                             disabled={isTransacting}
                         />
                             {/* Quick transfer buttons */}
-                            <div className="flex gap-1">
+                            <div className="tc-flex tc-gap-1">
                                 <Button
                                     onClick={() => setWithdrawAmountPercentage(25)}
                                     disabled={isTransacting || getSessionKeyBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     25%
                                 </Button>
@@ -329,7 +329,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getSessionKeyBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     50%
                                 </Button>
@@ -338,7 +338,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getSessionKeyBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     75%
                                 </Button>
@@ -347,7 +347,7 @@ export default function SessionKeyFunding() {
                                     disabled={isTransacting || getSessionKeyBalance() === 0}
                                     variant="outline"
                                     size="sm"
-                                    className="flex-1 text-xs"
+                                    className="tc-flex-1 tc-text-xs"
                                 >
                                     100%
                                 </Button>
@@ -362,17 +362,17 @@ export default function SessionKeyFunding() {
                                 !!withdrawAddressError
                             }
                             variant="secondary"
-                            className="col-span-1"
+                            className="tc-col-span-1"
                         >
                             {isTransacting ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <Loader2 className="tc-mr-2 tc-h-4 tc-w-4 tc-animate-spin" />
                             ) : (
                                 'Withdraw'
                             )}
                         </Button>
                     </div>
                     {withdrawError && (
-                        <p className="text-xs text-red-400 absolute">{withdrawError}</p>
+                        <p className="tc-text-xs tc-text-red-400 tc-absolute">{withdrawError}</p>
                     )}
                 </div>
             )}

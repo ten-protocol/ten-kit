@@ -56,61 +56,61 @@ export default function SessionKeyInfo() {
 
     if (!sessionKey) {
         return (
-            <Card className="bg-white/5">
+            <Card className="tc-bg-white/5">
                 <CardContent>
-                    <p className="text-center text-muted-foreground">No session key created yet</p>
+                    <p className="tc-text-center tc-text-muted-foreground">No session key created yet</p>
                 </CardContent>
             </Card>
         );
     }
 
     return (
-        <Card className="bg-white/5">
-            <CardHeader className="flex-row justify-between">
-                <CardTitle className="text-lg">Session Key Info</CardTitle>
+        <Card className="tc-bg-white/5">
+            <CardHeader className="tc-flex-row tc-justify-between tc-relative">
+                <CardTitle className="tc-text-lg">Session Key Info</CardTitle>
                 {/* Troubleshooting */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Settings className="h-4 w-4" />
+                        <Button variant="ghost" size="icon"  className="tc-absolute -tc-top-4 tc-right-0">
+                            <Settings className="tc-h-4 tc-w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
+                    <DropdownMenuContent className="tc-w-56">
                         <DropdownMenuLabel>
                             <h6>Session Key Actions</h6>
-                            <p className="opacity-80 text-xs text-destructive">
+                            <p className="tc-opacity-80 tc-text-xs tc-text-destructive">
                                 These actions may be destructive & you risk losing funds in the
                                 session key. Only use if you know what you&#39;re doing.
                             </p>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleClearLocalStorage} disabled={isLoading}>
-                            <Database className="mr-2 h-4 w-4" />
+                            <Database className="tc-mr-2 tc-h-4 tc-w-4" />
                             Clear Local State
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={handleTroubleshootDelete}
                             disabled={isLoading}
-                            className="text-destructive focus:text-destructive"
+                            className="tc-text-destructive focus:tc-text-destructive"
                         >
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash2 className="tc-mr-2 tc-h-4 tc-w-4" />
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </CardHeader>
             <CardContent>
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Address:</span>
-                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
+                <div className="tc-space-y-3">
+                    <div className="tc-flex tc-items-center tc-justify-between">
+                        <span className="tc-text-sm tc-font-medium">Address:</span>
+                        <code className="tc-text-xs tc-bg-muted tc-px-2 tc-py-1 tc-rounded tc-font-mono">
                             <WalletAddress address={sessionKey} />
                         </code>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Balance:</span>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-mono">
+                    <div className="tc-flex tc-items-center tc-justify-between">
+                        <span className="tc-text-sm tc-font-medium">Balance:</span>
+                        <div className="tc-flex tc-items-center tc-gap-2">
+                            <span className="tc-text-sm tc-font-mono">
                                 {balance
                                     ? `${formatBalance(balance.eth.toString())} ETH`
                                     : 'Loading...'}
@@ -120,10 +120,10 @@ export default function SessionKeyInfo() {
                                 disabled={isRefreshingBalance}
                                 variant="ghost"
                                 size="sm"
-                                className="h-6 w-6 p-0"
+                                className="tc-h-6 tc-w-6 tc-p-0"
                             >
                                 <RefreshCw
-                                    className={`h-3 w-3 ${isRefreshingBalance ? 'animate-spin' : ''}`}
+                                    className={`tc-h-3 tc-w-3 ${isRefreshingBalance ? 'tc-animate-spin' : ''}`}
                                 />
                             </Button>
                         </div>

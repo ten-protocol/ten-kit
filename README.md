@@ -379,13 +379,15 @@ A button component for wallet connection with built-in network detection.
 ```tsx
 interface ConnectWalletButtonProps {
   className?: string;
+  style?: React.CSSProperties;
   onChainChange?: (chainId: number, isCorrect: boolean) => void;
   gatewayUrl?: string;
 }
 ```
 
 **Props:**
-- `className`: Additional CSS classes
+- `className`: Additional CSS classes (use `!` prefix for overrides, e.g. `!bg-red-500`)
+- `style`: Inline styles for reliable style overrides
 - `onChainChange`: Callback when chain changes
 - `gatewayUrl`: Custom TEN Gateway URL (optional)
 
@@ -396,14 +398,32 @@ import { ConnectWalletButton } from '@tenprotocol/ten-kit';
 function Header() {
   return <ConnectWalletButton />;
 }
+
+// With custom styling
+function StyledHeader() {
+  return (
+    <ConnectWalletButton 
+      style={{ backgroundColor: '#3b82f6' }}
+      className="!rounded-full"
+    />
+  );
+}
 ```
 
 #### `SessionKeyManager`
 
 A complete session key management UI component with create, fund, and delete capabilities.
 
+```tsx
+interface SessionKeyManagerProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
+```
+
 **Props:**
-- None required (uses internal state management)
+- `className`: Additional CSS classes (use `!` prefix for overrides, e.g. `!bg-red-500`)
+- `style`: Inline styles for reliable style overrides
 
 **Features:**
 - Create new session keys
@@ -421,6 +441,16 @@ function Header() {
     <div className="flex gap-4">
       <ConnectWalletButton />
       <SessionKeyManager />
+    </div>
+  );
+}
+
+// With custom styling
+function StyledHeader() {
+  return (
+    <div className="flex gap-4">
+      <ConnectWalletButton style={{ backgroundColor: '#3b82f6' }} />
+      <SessionKeyManager style={{ backgroundColor: '#10b981' }} />
     </div>
   );
 }
@@ -713,7 +743,7 @@ console.log('Logs:', receipt.logs);
 
 This package uses Tailwind CSS for styling. You can customize the appearance by:
 
-1. **Using CSS custom properties** (recommended):
+1. **Using CSS custom properties** (recommended for theming):
 
 ```css
 :root {
@@ -723,13 +753,35 @@ This package uses Tailwind CSS for styling. You can customize the appearance by:
 }
 ```
 
-2. **Overriding component classes**:
+2. **Using the `style` prop** (recommended for component-level overrides):
+
+The `style` prop uses inline styles which reliably override the library's CSS:
 
 ```tsx
-<ConnectWalletButton className="bg-blue-500 hover:bg-blue-600" />
+<ConnectWalletButton 
+  style={{ backgroundColor: '#ef4444' }} 
+/>
+
+// With hover simulation using state
+<ConnectWalletButton 
+  style={{ 
+    backgroundColor: isHovered ? '#dc2626' : '#ef4444',
+    transition: 'background-color 150ms'
+  }} 
+/>
 ```
 
-3. **Using your own Tailwind configuration** that includes the component styles.
+3. **Using Tailwind's `!important` modifier**:
+
+Due to the library's CSS specificity, use Tailwind's `!` prefix to override styles:
+
+```tsx
+<ConnectWalletButton className="!bg-blue-500 hover:!bg-blue-600" />
+```
+
+> **Note:** Standard Tailwind classes like `bg-red-500` without `!` won't override the library's default styles due to CSS specificity. Use either the `style` prop or the `!` modifier.
+
+4. **Using your own Tailwind configuration** that includes the component styles.
 
 ## Storybook
 
@@ -767,6 +819,34 @@ npm run lint:fix
 ```bash
 npm run type-check
 ```
+
+### Testing with Examples
+
+This repository includes standalone example applications in the `examples/` directory that use the local TEN Kit package for testing and development.
+
+**To run an example:**
+
+1. Build the TEN Kit library:
+   ```bash
+   npm run build
+   ```
+
+2. Navigate to an example:
+   ```bash
+   cd examples/basic-wallet-connect
+   ```
+
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+4. Run the example:
+   ```bash
+   npm run dev
+   ```
+
+See the [examples README](./examples/README.md) for more information about available examples and how to create new ones.
 
 ## Examples
 

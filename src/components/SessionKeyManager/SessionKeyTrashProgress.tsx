@@ -48,22 +48,22 @@ export default function SessionKeyTrashProgress() {
     const progressPercentage = getProgressPercentage();
 
     return (
-        <div className="space-y-4">
+        <div className="tc-space-y-4">
             <h6>Closing session</h6>
 
             {/* Progress Bar */}
-            <Progress value={progressPercentage} className="w-full" />
+            <Progress value={progressPercentage} className="tc-w-full" />
 
             {/* Current Step Display */}
             {currentStep && (
-                <div className="flex items-center gap-2 opacity-70">
+                <div className="tc-flex tc-items-center tc-gap-2 tc-opacity-70">
                     <span>{currentStep}</span>
                 </div>
             )}
 
             {/* Reset Button */}
             {showResetButton && (
-                <div className="flex w-full justify-center">
+                <div className="tc-flex tc-w-full tc-justify-center">
                     <Button onClick={resetDeletionState} variant="secondary" size="default">
                         Go Back
                     </Button>

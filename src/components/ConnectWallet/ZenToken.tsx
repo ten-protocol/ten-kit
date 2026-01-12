@@ -96,31 +96,31 @@ export default function ZenToken({
     if (showAddTokenCTA) {
         return (
             <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="tc-h-4 tc-w-4" />
                 <AlertTitle>Add ZEN</AlertTitle>
                 <AlertDescription>
-                    <p className="text-sm">
+                    <p className="tc-text-sm">
                         To see the token balance in your wallet you&#39;ll need to import the token.
                     </p>
                 </AlertDescription>
-                <div className="mt-2 flex flex-col items-center gap-2">
-                    <div className="flex items-center justify-center gap-2">
+                <div className="tc-mt-2 tc-flex tc-flex-col tc-items-center tc-gap-2">
+                    <div className="tc-flex tc-items-center tc-justify-center tc-gap-2">
                         <Button
                             onClick={handleAddToken}
                             size="sm"
                             variant="outline"
-                            className="mt-2"
+                            className="tc-mt-2"
                         >
                             {zenContractAddress && shortenAddress(zenContractAddress)}
                         </Button>
                         <button
                             onClick={copyAddressToClipboard}
-                            className="text-xs flex items-center p-1 hover:bg-muted rounded"
+                            className="tc-text-xs tc-flex tc-items-center tc-p-1 hover:tc-bg-muted tc-rounded"
                             title="Copy full address to clipboard"
                             aria-label="Copy contract address"
                         >
                             <Copy size={14} />
-                            {copied && <span className="ml-1 text-white/60">Copied!</span>}
+                            {copied && <span className="tc-ml-1 tc-text-white/60">Copied!</span>}
                         </button>
                     </div>
                 </div>
@@ -130,7 +130,7 @@ export default function ZenToken({
 
     return (
         <Alert>
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="tc-h-4 tc-w-4" />
             <AlertTitle>Insufficient funds to play</AlertTitle>
             <AlertDescription>
                 Visit the{' '}
@@ -138,10 +138,10 @@ export default function ZenToken({
                     href="https://faucet.ten.xyz/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline font-bold inline-flex gap-x-1 items-center text-white/80 hover:text-white"
+                    className="tc-underline tc-font-bold tc-inline-flex tc-gap-x-1 tc-items-center tc-text-white/80 hover:tc-text-white"
                 >
                     TEN Faucet
-                    <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="tc-w-3 tc-h-3" />
                 </a>{' '}
                 to top-up your wallet balance.
             </AlertDescription>

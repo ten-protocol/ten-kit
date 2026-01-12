@@ -10,7 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '../ui/dialog';
-import { formatBalance } from '@/lib/utils';
+import { cn, formatBalance } from '@/lib/utils';
 import { DeletionState, useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
 import { useState } from 'react';
 import SessionKeyInfo from './SessionKeyInfo';
@@ -20,7 +20,12 @@ import SessionKeyTrashProgress from './SessionKeyTrashProgress';
 import { useSessionKeyStore } from '@/stores/sessionKey.store';
 import {TEN_CHAIN_ID} from "@/lib/constants";
 
-export default function SessionKeyManager() {
+interface SessionKeyManagerProps {
+    className?: string;
+    style?: React.CSSProperties;
+}
+
+export default function SessionKeyManager({ className, style }: SessionKeyManagerProps) {
     const { isConnected, connector, chain } = useAccount();
     const { sessionKey, isLoading, error, balance } = useSessionKeyStore();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -55,22 +60,22 @@ export default function SessionKeyManager() {
 
         if (!sessionKey) {
             return (
-                <Button variant="outline">
-                    <Key className="mr-2 h-4 w-4" />
+                <Button variant="outline" className={cn(className)} style={style}>
+                    <Key className="tc-mr-2 tc-h-4 tc-w-4" />
                     Start Session
                 </Button>
             );
         }
 
         return (
-            <Button variant="outline" className="flex items-center gap-2">
-                <Key className="h-4 w-4" />
-                <div className="flex items-center gap-2">
-                    <span className="hidden md:inline">Session Key</span>
+            <Button variant="outline" className={cn("tc-flex tc-items-center tc-gap-2", className)} style={style}>
+                <Key className="tc-h-4 tc-w-4" />
+                <div className="tc-flex tc-items-center tc-gap-2">
+                    <span className="tc-hidden md:tc-inline">Session Key</span>
                     {balance && (
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="tc-text-xs tc-text-muted-foreground tc-flex tc-items-center tc-gap-1">
                             {isRefreshingBalance ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
+                                <Loader2 className="tc-h-3 tc-w-3 tc-animate-spin" />
                             ) : null}
                             {formatBalance(balance.eth.toString())} ETH
                         </span>
@@ -84,14 +89,14 @@ export default function SessionKeyManager() {
         <div className="ten-connect">
             <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
                 <DialogTrigger asChild>{renderTriggerButton()}</DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="tc-max-w-md">
                     <DialogHeader>
                         <DialogTitle>Session Key Manager</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-6">
+                    <div className="tc-space-y-6">
                         {error && (
                             <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
+                                <AlertCircle className="tc-h-4 tc-w-4" />
                                 <AlertTitle>Error</AlertTitle>
                                 <AlertDescription>{error.message}</AlertDescription>
                             </Alert>
@@ -99,7 +104,7 @@ export default function SessionKeyManager() {
 
                         {isLoading && (
                             <Alert>
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <Loader2 className="tc-h-4 tc-w-4 tc-animate-spin" />
                                 <AlertTitle>Processing</AlertTitle>
                                 <AlertDescription>
                                     Please wait while we process your request...
@@ -108,7 +113,7 @@ export default function SessionKeyManager() {
                         )}
 
                         {deletionState === DeletionState.IDLE && (
-                            <div className="space-y-4">
+                            <div className="tc-space-y-4">
                                 <SessionKeyInfo />
                                 <SessionKeyFunding />
                                 <SessionKeyTrash />

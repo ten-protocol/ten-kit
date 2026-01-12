@@ -78,11 +78,11 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
 
     const WalletList = () => {
         return (
-            <div className="grid gap-4 py-4">
+            <div className="tc-grid tc-gap-4 tc-py-4">
                 {usableWalletList.length === 0 ? (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-center">
+                            <CardTitle className="tc-text-center">
                                 You have no wallets compatible with TEN Protocol.
                             </CardTitle>
                         </CardHeader>
@@ -91,7 +91,7 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="tc-flex tc-flex-col tc-gap-4">
                         {usableWalletList.length > 0 && <h4>Your Supported Wallets</h4>}
                         {usableWalletList}
                     </div>
@@ -113,27 +113,27 @@ export default function ConnectModal({ isOpen, onOpenChange, gatewayUrl = DEFAUL
                     </DialogDescription>
                 </DialogHeader>
 
-                <Alert variant="default" className="mt-2 border-foreground/10">
-                    <AlertCircle className="h-4 w-4" />
+                <Alert variant="default" className="tc-mt-2 tc-border-foreground/10">
+                    <AlertCircle className="tc-h-4 tc-w-4" />
                     <AlertTitle>Heads up!</AlertTitle>
                     <AlertDescription>
                         Before being able to connect to TEN Protocol for the first time, you&#39;ll
                         need to visit the{' '}
                         <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                            <span className="inline-flex gap-1 justify-center items-center text-bold hover:underline">
-                                TEN Gateway <ExternalLink className="w-3 h-3" />
+                            <span className="tc-inline-flex tc-gap-1 tc-justify-center tc-items-center tc-text-bold hover:tc-underline">
+                                TEN Gateway <ExternalLink className="tc-w-3 tc-h-3" />
                             </span>
                         </a>{' '}
                         beforehand to get onboarded onto the network.
-                        <Button asChild variant="outline" className="w-full mt-2 self-center">
+                        <Button asChild variant="outline" className="tc-w-full tc-mt-2 tc-self-center">
                             <a href={gatewayUrl} target="_blank" rel="noopener noreferrer">
-                                Visit TEN Gateway <ExternalLink className="ml-2 w-4 h-4" />
+                                Visit TEN Gateway <ExternalLink className="tc-ml-2 tc-w-4 tc-h-4" />
                             </a>
                         </Button>
                     </AlertDescription>
                 </Alert>
 
-                <div className="grid gap-4 py-4">
+                <div className="tc-grid tc-gap-4 tc-py-4">
                     <WalletList />
                 </div>
             </DialogContent>

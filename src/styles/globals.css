@@ -1,30 +1,33 @@
+/* Define layer order - base resets come before utilities */
+@layer tc-base, tc-components, tc-utilities;
+
 /* Remove @tailwind base to avoid global style pollution */
 @tailwind components;
 @tailwind utilities;
 
 /* Scoped CSS variables and base styles for TENConnect library */
 .ten-connect {
-  /* CSS Variables */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --color-accent: 0 100% 71.76%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
+  /* CSS Variables - prefixed to avoid conflicts with host apps */
+  --tc-background: 0 0% 100%;
+  --tc-foreground: 222.2 84% 4.9%;
+  --tc-card: 0 0% 100%;
+  --tc-card-foreground: 222.2 84% 4.9%;
+  --tc-popover: 0 0% 100%;
+  --tc-popover-foreground: 222.2 84% 4.9%;
+  --tc-primary: 222.2 47.4% 11.2%;
+  --tc-primary-foreground: 210 40% 98%;
+  --tc-secondary: 210 40% 96%;
+  --tc-secondary-foreground: 222.2 47.4% 11.2%;
+  --tc-muted: 210 40% 96%;
+  --tc-muted-foreground: 215.4 16.3% 46.9%;
+  --tc-accent: 0 100% 71.76%;
+  --tc-accent-foreground: 222.2 47.4% 11.2%;
+  --tc-destructive: 0 84.2% 60.2%;
+  --tc-destructive-foreground: 210 40% 98%;
+  --tc-border: 214.3 31.8% 91.4%;
+  --tc-input: 214.3 31.8% 91.4%;
+  --tc-ring: 222.2 84% 4.9%;
+  --tc-radius: 0.5rem;
   
   /* Base styles */
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -33,11 +36,30 @@
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply text-foreground;
+  color: hsl(var(--tc-foreground));
 }
 
 .ten-connect a {
-  @apply text-accent;
+  color: hsl(var(--tc-accent));
+}
+
+/* Font isolation - outside @layer to beat unlayered host app styles */
+.ten-connect h1,
+.ten-connect h2,
+.ten-connect h3,
+.ten-connect h4,
+.ten-connect h5,
+.ten-connect h6,
+.ten-connect p,
+.ten-connect span,
+.ten-connect div,
+.ten-connect li,
+.ten-connect td,
+.ten-connect th,
+.ten-connect label {
+  font-family: inherit;
+  font-style: inherit;
+  letter-spacing: inherit;
 }
 
 /* Portal wrapper uses display:contents to not affect layout while providing CSS scope */
@@ -46,102 +68,116 @@
   display: contents !important;
 }
 
-.ten-connect *,
-.ten-connect *::before,
-.ten-connect *::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: theme('colors.gray.200');
-}
+/* Base reset styles in a lower-priority layer so Tailwind utilities can override */
+@layer tc-base {
+  .ten-connect *,
+  .ten-connect *::before,
+  .ten-connect *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: hsl(var(--tc-border));
+    /* Prevent font leakage from containing app */
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+  }
 
-.ten-connect button,
-.ten-connect input,
-.ten-connect optgroup,
-.ten-connect select,
-.ten-connect textarea {
-  font-family: inherit;
-  font-feature-settings: inherit;
-  font-variation-settings: inherit;
-  font-size: 100%;
-  font-weight: inherit;
-  line-height: inherit;
-  color: inherit;
-  margin: 0;
-  padding: 0;
-}
+  .ten-connect button,
+  .ten-connect input,
+  .ten-connect optgroup,
+  .ten-connect select,
+  .ten-connect textarea {
+    font-family: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+  }
 
-.ten-connect button,
-.ten-connect select {
-  text-transform: none;
-}
+  .ten-connect button,
+  .ten-connect select {
+    text-transform: none;
+  }
 
-.ten-connect button,
-.ten-connect [type='button'],
-.ten-connect [type='reset'],
-.ten-connect [type='submit'] {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none;
-}
+  .ten-connect button,
+  .ten-connect [type='button'],
+  .ten-connect [type='reset'],
+  .ten-connect [type='submit'] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+  }
 
-.ten-connect [role="button"],
-.ten-connect button {
-  cursor: pointer;
-}
+  .ten-connect [role="button"],
+  .ten-connect button {
+    cursor: pointer;
+  }
 
-.ten-connect :disabled {
-  cursor: default;
-}
+  .ten-connect :disabled {
+    cursor: default;
+  }
 
-.ten-connect h1,
-.ten-connect h2,
-.ten-connect h3,
-.ten-connect h4,
-.ten-connect h5,
-.ten-connect h6 {
-  font-size: inherit;
-  font-weight: inherit;
-  margin: 0;
-}
+  .ten-connect h1,
+  .ten-connect h2,
+  .ten-connect h3,
+  .ten-connect h4,
+  .ten-connect h5,
+  .ten-connect h6 {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    margin: 0;
+  }
 
-.ten-connect img,
-.ten-connect svg,
-.ten-connect video,
-.ten-connect canvas,
-.ten-connect audio,
-.ten-connect iframe,
-.ten-connect embed,
-.ten-connect object {
-  display: block;
-  vertical-align: middle;
-}
+  .ten-connect img,
+  .ten-connect svg,
+  .ten-connect video,
+  .ten-connect canvas,
+  .ten-connect audio,
+  .ten-connect iframe,
+  .ten-connect embed,
+  .ten-connect object {
+    display: block;
+    vertical-align: middle;
+  }
 
-.ten-connect img,
-.ten-connect video {
-  max-width: 100%;
-  height: auto;
+  .ten-connect img,
+  .ten-connect video {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 .ten-connect.dark,
 .ten-connect .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
+  --tc-background: 222.2 84% 4.9%;
+  --tc-foreground: 210 40% 98%;
+  --tc-card: 222.2 84% 4.9%;
+  --tc-card-foreground: 210 40% 98%;
+  --tc-popover: 222.2 84% 4.9%;
+  --tc-popover-foreground: 210 40% 98%;
+  --tc-primary: 210 40% 98%;
+  --tc-primary-foreground: 222.2 47.4% 11.2%;
+  --tc-secondary: 217.2 32.6% 17.5%;
+  --tc-secondary-foreground: 210 40% 98%;
+  --tc-muted: 217.2 32.6% 17.5%;
+  --tc-muted-foreground: 215 20.2% 65.1%;
+  --tc-accent: 217.2 32.6% 17.5%;
+  --tc-accent-foreground: 210 40% 98%;
+  --tc-destructive: 0 62.8% 30.6%;
+  --tc-destructive-foreground: 210 40% 98%;
+  --tc-border: 217.2 32.6% 17.5%;
+  --tc-input: 217.2 32.6% 17.5%;
+  --tc-ring: 212.7 26.8% 83.9%;
 }

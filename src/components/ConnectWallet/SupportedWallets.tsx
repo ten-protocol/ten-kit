@@ -3,13 +3,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 export default function SupportedWallets() {
     return (
-        <div className="text-center">
-            <h4 className="text-2xl">Recommended Wallets</h4>
-            <p className="opacity-70">
+        <div className="tc-text-center">
+            <h4 className="tc-text-2xl">Recommended Wallets</h4>
+            <p className="tc-opacity-70">
                 These popular wallets are confirmed to work smoothly with the Gateway.
             </p>
 
-            <div className="flex justify-center gap-6 mt-6">
+            <div className="tc-flex tc-justify-center tc-gap-6 tc-mt-6">
                 {supportedWallets
                     .map((wallet) => (
                         <div key={wallet.name}>
@@ -21,7 +21,7 @@ export default function SupportedWallets() {
                                             height={48}
                                             width={48}
                                             alt={wallet.name}
-                                            className="w-[32px]"
+                                            className="tc-w-[32px]"
                                         />
                                     </a>
                                 </TooltipTrigger>
