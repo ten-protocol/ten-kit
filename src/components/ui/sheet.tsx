@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useThemeStore } from "@/stores/theme.store"
 
 const Sheet = SheetPrimitive.Root
 
@@ -21,7 +22,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      "tc-fixed tc-inset-0 tc-z-50 tc-bg-black/80 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0",
+      "tc-fixed tc-inset-0 tc-z-50 tc-bg-black/80 dark:tc-bg-white/80 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0",
       className
     )}
     {...props}
@@ -56,9 +57,11 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
+>(({ side = "right", className, children, ...props }, ref) => {
+  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+  return (
   <SheetPortal>
-    <div className="ten-connect" data-portal-wrapper>
+    <div className={cn("ten-connect", resolvedTheme === "dark" && "dark")} data-portal-wrapper>
       <SheetOverlay />
       <SheetPrimitive.Content
         ref={ref}
@@ -73,7 +76,8 @@ const SheetContent = React.forwardRef<
       </SheetPrimitive.Content>
     </div>
   </SheetPortal>
-))
+);
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({

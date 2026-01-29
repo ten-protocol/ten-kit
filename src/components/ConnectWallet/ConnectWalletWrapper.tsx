@@ -5,6 +5,7 @@ import ConnectWalletButton from './ConnectWalletButton';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
+import { useThemeStore } from '@/stores/theme.store';
 
 interface ConnectWalletProps {
     children: ReactNode;
@@ -24,6 +25,8 @@ export default function ConnectWalletWrapper({
     const { isConnected, chainId } = useAccount();
     const isCorrectChain = chainId === TEN_CHAIN_ID;
     const showContent = isConnected && isCorrectChain;
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+    const themeClass = resolvedTheme === 'dark' ? 'dark' : '';
 
     const containerClasses = cn('', {
         'tc-opacity-50 tc-pointer-events-none': loading,
@@ -31,7 +34,7 @@ export default function ConnectWalletWrapper({
 
     if (showContent && errorState) {
         return (
-            <div className="ten-connect tc-flex tc-flex-col tc-gap-2 tc-my-6 tc-text-center tc-items-center">
+            <div className={cn('ten-connect tc-flex tc-flex-col tc-gap-2 tc-my-6 tc-text-center tc-items-center', themeClass)}>
                 <h3 className="tc-text-xl">Error fetching contract data</h3>
                 <p className="tc-mb-4 tc-opacity-90">
                     This may be because your access token has been revoked or has expired (this will
@@ -49,7 +52,7 @@ export default function ConnectWalletWrapper({
 
     if (showContent) {
         return (
-            <div className={cn('ten-connect', containerClasses)}>
+            <div className={cn('ten-connect', themeClass, containerClasses)}>
                 {children}
                 {loading && (
                     <div className="tc-h-[3px] tc-my-[25px] tc-overflow-hidden tc-relative">
@@ -64,6 +67,7 @@ export default function ConnectWalletWrapper({
         <div
             className={cn(
                 'ten-connect tc-flex tc-flex-col tc-items-center tc-justify-center tc-gap-4 tc-p-4 tc-text-center',
+                themeClass,
                 className
             )}
         >

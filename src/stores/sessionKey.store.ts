@@ -337,6 +337,22 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                     }
 
                     // 5. Build EIP-1559 transaction array
+                    const normalizeValue = (val: string | undefined): string => {
+                        if (!val || val === '0x' || val === '0x0' || val === '0x00') {
+                            return '0x'; // Empty bytes for zero value in RLP
+                        }
+                        // Strip leading zeros after 0x prefix for proper RLP encoding
+                        const stripped = val.replace(/^0x0+/, '0x');
+                        return stripped === '0x' ? '0x' : val.toLowerCase();
+                    };
+
+                    const normalizeData = (data: string | undefined): string => {
+                        if (!data || data === '0x') {
+                            return '0x'; // Empty bytes for empty data in RLP
+                        }
+                        return data.toLowerCase();
+                    };
+
                     const txArray = [
                         toHex(chainIdInt), // chainId
                         nonce === 0 ? '0x' : toHex(nonce), // nonce (special case for 0)
@@ -344,14 +360,14 @@ export const useSessionKeyStore = create<SessionKeyStore>()(
                         toRlpHex(maxFeePerGas), // maxFeePerGas
                         toRlpHex(gasLimit), // gasLimit
                         txParams.to.toLowerCase(), // to (ensure lowercase)
-                        txParams.value ? txParams.value.toLowerCase() : '', // value (empty string for zero in RLP)
-                        txParams.data?.toLowerCase() || '', // data (empty string for empty data in RLP)
-                        [], // accessList (empty for now)
-                        '', // v (signature placeholder - empty for RLP)
-                        '', // r (signature placeholder - empty for RLP)
-                        '', // s (signature placeholder - empty for RLP)
+                        normalizeValue(txParams.value), // value (MUST be '0x' for zero, not '0x0')
+                        normalizeData(txParams.data), // data (MUST be '0x' for empty, not '')
+                        [], // accessList (MUST be empty array for TEN RPC)
+                        '0x', // v (signature placeholder - empty bytes)
+                        '0x', // r (signature placeholder - empty bytes)
+                        '0x', // s (signature placeholder - empty bytes)
                     ].map((value) => {
-                        // For RLP encoding: empty strings stay empty, non-empty hex strings get 0x prefix
+                        // For RLP encoding: '0x' stays as '0x' (empty bytes), other hex strings pass through
                         if (typeof value === 'string' && value !== '' && !value.startsWith('0x')) {
                             return '0x' + value;
                         }

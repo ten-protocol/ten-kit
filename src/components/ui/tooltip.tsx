@@ -4,6 +4,7 @@ import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
+import { useThemeStore } from "@/stores/theme.store"
 
 function TooltipProvider({
                              delayDuration = 0,
@@ -40,9 +41,10 @@ function TooltipContent({
                             children,
                             ...props
                         }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     return (
         <TooltipPrimitive.Portal>
-            <div className="ten-connect" data-portal-wrapper>
+            <div className={cn("ten-connect", resolvedTheme === "dark" && "dark")} data-portal-wrapper>
                 <TooltipPrimitive.Content
                     data-slot="tooltip-content"
                     sideOffset={sideOffset}

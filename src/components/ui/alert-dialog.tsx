@@ -4,6 +4,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useThemeStore } from "@/stores/theme.store"
 
 const AlertDialog = AlertDialogPrimitive.Root
 
@@ -17,7 +18,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "tc-fixed tc-inset-0 tc-z-50 tc-bg-black/80 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0",
+      "tc-fixed tc-inset-0 tc-z-50 tc-bg-black/80 dark:tc-bg-white/80 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0",
       className
     )}
     {...props}
@@ -29,9 +30,11 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
->(({ className, ...props }, ref) => (
+>(({ className, ...props }, ref) => {
+  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+  return (
   <AlertDialogPortal>
-    <div className="ten-connect" data-portal-wrapper>
+    <div className={cn("ten-connect", resolvedTheme === "dark" && "dark")} data-portal-wrapper>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
         ref={ref}
@@ -43,7 +46,8 @@ const AlertDialogContent = React.forwardRef<
       />
     </div>
   </AlertDialogPortal>
-))
+);
+})
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({

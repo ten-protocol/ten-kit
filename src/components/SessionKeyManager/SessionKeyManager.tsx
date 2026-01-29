@@ -12,23 +12,27 @@ import {
 } from '../ui/dialog';
 import { cn, formatBalance } from '@/lib/utils';
 import { DeletionState, useSessionKeyManagerStore } from '@/stores/sessionKeyManager.store';
-import { useState } from 'react';
 import SessionKeyInfo from './SessionKeyInfo';
 import SessionKeyFunding from './SessionKeyFunding';
 import SessionKeyTrash from './SessionKeyTrash';
 import SessionKeyTrashProgress from './SessionKeyTrashProgress';
 import { useSessionKeyStore } from '@/stores/sessionKey.store';
+import { useUIStore } from '@/stores/ui.store';
+import { useThemeStore } from '@/stores/theme.store';
 import {TEN_CHAIN_ID} from "@/lib/constants";
 
 interface SessionKeyManagerProps {
     className?: string;
     style?: React.CSSProperties;
+    /** Hide the trigger button, useful when controlling the modal externally */
+    hideTrigger?: boolean;
 }
 
-export default function SessionKeyManager({ className, style }: SessionKeyManagerProps) {
+export default function SessionKeyManager({ className, style, hideTrigger = false }: SessionKeyManagerProps) {
     const { isConnected, connector, chain } = useAccount();
     const { sessionKey, isLoading, error, balance } = useSessionKeyStore();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const { isSessionKeyModalOpen, setSessionKeyModalOpen } = useUIStore();
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     const isWrongChain = !chain || Number(chain.id) !== Number(TEN_CHAIN_ID);
 
     const { deletionState, isRefreshingBalance, initSession } =
@@ -43,7 +47,7 @@ export default function SessionKeyManager({ className, style }: SessionKeyManage
 
     // Handle dialog open/close
     const handleDialogOpenChange = (open: boolean) => {
-        setIsDialogOpen(open);
+        setSessionKeyModalOpen(open);
         // Clear any errors when closing the dialog
         if (!open) {
             if (error) {
@@ -54,13 +58,13 @@ export default function SessionKeyManager({ className, style }: SessionKeyManage
 
     // Render trigger button
     const renderTriggerButton = () => {
-        if (!isConnected || isWrongChain) {
+        if (hideTrigger || !isConnected || isWrongChain) {
             return null;
         }
 
         if (!sessionKey) {
             return (
-                <Button variant="outline" className={cn(className)} style={style}>
+                <Button variant="secondary" className={cn(className)} style={style}>
                     <Key className="tc-mr-2 tc-h-4 tc-w-4" />
                     Start Session
                 </Button>
@@ -68,7 +72,7 @@ export default function SessionKeyManager({ className, style }: SessionKeyManage
         }
 
         return (
-            <Button variant="outline" className={cn("tc-flex tc-items-center tc-gap-2", className)} style={style}>
+            <Button variant="secondary" className={cn("tc-flex tc-items-center tc-gap-2", className)} style={style}>
                 <Key className="tc-h-4 tc-w-4" />
                 <div className="tc-flex tc-items-center tc-gap-2">
                     <span className="tc-hidden md:tc-inline">Session Key</span>
@@ -86,8 +90,8 @@ export default function SessionKeyManager({ className, style }: SessionKeyManage
     };
 
     return (
-        <div className="ten-connect">
-            <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+        <div className={cn('ten-connect', resolvedTheme === 'dark' && 'dark')}>
+            <Dialog open={isSessionKeyModalOpen} onOpenChange={handleDialogOpenChange}>
                 <DialogTrigger asChild>{renderTriggerButton()}</DialogTrigger>
                 <DialogContent className="tc-max-w-md">
                     <DialogHeader>

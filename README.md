@@ -95,13 +95,13 @@ function MyComponent() {
 
 ## Quick Start
 
-### Basic Example: Wallet Connection Only
+### Recommended: TenConnectButton
 
-The simplest setup - just wallet connection without session keys:
+The easiest way to add wallet connection to your dApp. This all-in-one button handles wallet connection, displays balance, and includes an integrated dropdown menu.
 
 ```tsx
 import React from 'react';
-import { TENWagmiConfig, ConnectWalletButton } from '@tenprotocol/ten-kit';
+import { TENWagmiConfig, TenConnectButton } from '@tenprotocol/ten-kit';
 import { useAccount } from 'wagmi';
 import { WagmiProvider, createConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -115,7 +115,7 @@ const MyDApp = () => (
       <div className="p-8 max-w-md mx-auto">
         <header className="flex flex-col justify-center items-center">
           <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
-          <ConnectWalletButton />
+          <TenConnectButton />
         </header>
         <AppContent />
       </div>
@@ -146,16 +146,15 @@ const AppContent = () => {
 export default MyDApp;
 ```
 
-### Advanced Example: With Session Keys
+### With Session Keys
 
-For privacy-preserving transactions, add the `SessionKeyManager` component:
+For privacy-preserving transactions, enable session key support:
 
 ```tsx
 import React from 'react';
 import { 
   TENWagmiConfig,
-  ConnectWalletButton, 
-  SessionKeyManager,
+  TenConnectButton,
   useSessionKeyStore 
 } from '@tenprotocol/ten-kit';
 import { useAccount } from 'wagmi';
@@ -171,10 +170,8 @@ const MyDApp = () => (
       <div className="p-8 max-w-md mx-auto">
         <header className="flex flex-col justify-center items-center">
           <h1 className="text-2xl font-bold mb-4">My TEN dApp</h1>
-          <div className="flex gap-4 justify-center mb-6">
-            <ConnectWalletButton />
-            <SessionKeyManager />
-          </div>
+          {/* Enable session key management in the dropdown */}
+          <TenConnectButton enableSessionKey />
         </header>
         <AppContent />
       </div>
@@ -204,6 +201,20 @@ const AppContent = () => {
 };
 
 export default MyDApp;
+```
+
+### Alternative: Separate Components
+
+If you prefer more control, you can use `ConnectWalletButton` and `SessionKeyManager` as separate components:
+
+```tsx
+import { ConnectWalletButton, SessionKeyManager } from '@tenprotocol/ten-kit';
+
+// In your component:
+<div className="flex gap-4">
+  <ConnectWalletButton />
+  <SessionKeyManager />
+</div>
 ```
 
 ### Sending Transactions with Session Keys
@@ -349,6 +360,57 @@ function App() {
     </WagmiProvider>
   );
 }
+```
+
+#### `TenConnectButton`
+
+The recommended all-in-one button for wallet connection. Displays balance, handles network switching, and includes a dropdown menu with wallet info and disconnect options. Optionally supports session key management.
+
+```tsx
+interface TenConnectButtonProps {
+  className?: string;
+  style?: React.CSSProperties;
+  onChainChange?: (chainId: number, isCorrect: boolean) => void;
+  gatewayUrl?: string;
+  onTrackEvent?: (event: string, data: any) => void;
+  enableSessionKey?: boolean; // Default: false
+}
+```
+
+**Props:**
+- `className`: Additional CSS classes
+- `style`: Inline styles for reliable style overrides
+- `onChainChange`: Callback when chain changes
+- `gatewayUrl`: Custom TEN Gateway URL (optional)
+- `onTrackEvent`: Callback for tracking events
+- `enableSessionKey`: Enable session key features in dropdown (default: `false`)
+
+**Features:**
+- Shows "Connect Wallet" button when disconnected
+- Displays ETH balance when connected
+- Shows session status when `enableSessionKey` is true
+- Dropdown menu with:
+  - Wallet Info (address, network details)
+  - Start/End Session (when `enableSessionKey` is true)
+  - Session Key Manager (when `enableSessionKey` is true)
+  - Disconnect
+
+**Usage:**
+```tsx
+import { TenConnectButton } from '@tenprotocol/ten-kit';
+
+// Basic usage (wallet only)
+<TenConnectButton />
+
+// With session key support
+<TenConnectButton enableSessionKey />
+
+// With custom styling
+<TenConnectButton 
+  enableSessionKey
+  style={{ backgroundColor: '#3b82f6' }}
+  className="!rounded-full"
+/>
 ```
 
 #### `ConnectWalletWrapper`
@@ -833,7 +895,7 @@ This repository includes standalone example applications in the `examples/` dire
 
 2. Navigate to an example:
    ```bash
-   cd examples/basic-wallet-connect
+   cd examples/basic-app
    ```
 
 3. Install dependencies:

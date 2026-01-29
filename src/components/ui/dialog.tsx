@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { useThemeStore } from '@/stores/theme.store';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -20,7 +21,7 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            'tc-fixed tc-inset-0 tc-z-50 tc-bg-black/80 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0',
+            'tc-fixed tc-inset-0 tc-z-50 tc-bg-black/60 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0',
             className
         )}
         {...props}
@@ -31,14 +32,16 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => {
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+    return (
     <DialogPortal>
-        <div className="ten-connect" data-portal-wrapper>
+        <div className={cn('ten-connect', resolvedTheme === 'dark' && 'dark')} data-portal-wrapper>
             <DialogOverlay />
             <DialogPrimitive.Content
                 ref={ref}
                 className={cn(
-                    'tc-fixed tc-left-[50%] tc-top-[50%] tc-z-50 tc-grid tc-w-full tc-max-w-lg tc-translate-x-[-50%] tc-translate-y-[-50%] tc-gap-4 tc-border tc-border-foreground/10 tc-bg-background tc-p-6 tc-shadow-lg tc-duration-200 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0 data-[state=closed]:tc-zoom-out-95 data-[state=open]:tc-zoom-in-95 data-[state=closed]:tc-slide-out-to-left-1/2 data-[state=closed]:tc-slide-out-to-top-[48%] data-[state=open]:tc-slide-in-from-left-1/2 data-[state=open]:tc-slide-in-from-top-[48%] sm:tc-rounded-lg',
+                    'tc-fixed tc-left-[50%] tc-top-[50%] tc-z-50 tc-grid tc-w-full tc-border-0 tc-max-w-lg tc-translate-x-[-50%] tc-translate-y-[-50%] tc-gap-4 tc-bg-background tc-p-6 tc-shadow-lg tc-duration-200 data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0 data-[state=closed]:tc-zoom-out-95 data-[state=open]:tc-zoom-in-95 data-[state=closed]:tc-slide-out-to-left-1/2 data-[state=closed]:tc-slide-out-to-top-[48%] data-[state=open]:tc-slide-in-from-left-1/2 data-[state=open]:tc-slide-in-from-top-[48%] sm:tc-rounded-lg',
                     className
                 )}
                 {...props}
@@ -51,7 +54,8 @@ const DialogContent = React.forwardRef<
             </DialogPrimitive.Content>
         </div>
     </DialogPortal>
-));
+);
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

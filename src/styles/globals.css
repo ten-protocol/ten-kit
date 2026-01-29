@@ -40,7 +40,7 @@
 }
 
 .ten-connect a {
-  color: hsl(var(--tc-accent));
+  color: cornflowerblue;
 }
 
 /* Font isolation - outside @layer to beat unlayered host app styles */
@@ -161,23 +161,23 @@
 
 .ten-connect.dark,
 .ten-connect .dark {
-  --tc-background: 222.2 84% 4.9%;
-  --tc-foreground: 210 40% 98%;
-  --tc-card: 222.2 84% 4.9%;
-  --tc-card-foreground: 210 40% 98%;
-  --tc-popover: 222.2 84% 4.9%;
-  --tc-popover-foreground: 210 40% 98%;
-  --tc-primary: 210 40% 98%;
-  --tc-primary-foreground: 222.2 47.4% 11.2%;
-  --tc-secondary: 217.2 32.6% 17.5%;
-  --tc-secondary-foreground: 210 40% 98%;
-  --tc-muted: 217.2 32.6% 17.5%;
-  --tc-muted-foreground: 215 20.2% 65.1%;
-  --tc-accent: 217.2 32.6% 17.5%;
-  --tc-accent-foreground: 210 40% 98%;
-  --tc-destructive: 0 62.8% 30.6%;
-  --tc-destructive-foreground: 210 40% 98%;
-  --tc-border: 217.2 32.6% 17.5%;
-  --tc-input: 217.2 32.6% 17.5%;
-  --tc-ring: 212.7 26.8% 83.9%;
+  --tc-background: 0 0% 15%;
+  --tc-foreground: 0 0% 98%;
+  --tc-card: 0 0% 5%;
+  --tc-card-foreground: 0 0% 98%;
+  --tc-popover: 0 0% 10%;
+  --tc-popover-foreground: 0 0% 98%;
+  --tc-primary: 0 0% 98%;
+  --tc-primary-foreground: 0 0% 11%;
+  --tc-secondary: 0 0% 17%;
+  --tc-secondary-foreground: 0 0% 98%;
+  --tc-muted: 0 0% 20%;
+  --tc-muted-foreground: 0 0% 65%;
+  --tc-accent: 0 0% 17%;
+  --tc-accent-foreground: 0 0% 98%;
+  --tc-destructive: 0 84% 70%;
+  --tc-destructive-foreground: 0 0% 98%;
+  --tc-border: 0 0% 17%;
+  --tc-input: 0 0% 30%;
+  --tc-ring: 0 0% 84%;
 }

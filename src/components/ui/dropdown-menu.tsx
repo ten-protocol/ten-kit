@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useThemeStore } from '@/stores/theme.store';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -40,8 +41,10 @@ DropdownMenuSubTrigger.displayName =
 const DropdownMenuSubContent = React.forwardRef<
     React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
     React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
->(({ className, ...props }, ref) => (
-    <div className="ten-connect" data-portal-wrapper>
+>(({ className, ...props }, ref) => {
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+    return (
+    <div className={cn('ten-connect', resolvedTheme === 'dark' && 'dark')} data-portal-wrapper>
         <DropdownMenuPrimitive.SubContent
             ref={ref}
             className={cn(
@@ -51,28 +54,32 @@ const DropdownMenuSubContent = React.forwardRef<
             {...props}
         />
     </div>
-));
+);
+});
 DropdownMenuSubContent.displayName =
     DropdownMenuPrimitive.SubContent.displayName;
 
 const DropdownMenuContent = React.forwardRef<
     React.ElementRef<typeof DropdownMenuPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 4, ...props }, ref) => {
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+    return (
     <DropdownMenuPrimitive.Portal>
-        <div className="ten-connect" data-portal-wrapper>
+        <div className={cn('ten-connect', resolvedTheme === 'dark' && 'dark')} data-portal-wrapper>
             <DropdownMenuPrimitive.Content
                 ref={ref}
                 sideOffset={sideOffset}
                 className={cn(
-                    'tc-z-50 tc-min-w-[8rem] tc-overflow-hidden tc-rounded-md tc-border tc-bg-popover tc-p-1 tc-text-popover-foreground tc-shadow-md data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0 data-[state=closed]:tc-zoom-out-95 data-[state=open]:tc-zoom-in-95 data-[side=bottom]:tc-slide-in-from-top-2 data-[side=left]:tc-slide-in-from-right-2 data-[side=right]:tc-slide-in-from-left-2 data-[side=top]:tc-slide-in-from-bottom-2',
+                    'tc-z-50 tc-min-w-[8rem] tc-overflow-hidden tc-rounded-md tc-bg-popover tc-p-1 tc-text-popover-foreground tc-shadow-md data-[state=open]:tc-animate-in data-[state=closed]:tc-animate-out data-[state=closed]:tc-fade-out-0 data-[state=open]:tc-fade-in-0 data-[state=closed]:tc-zoom-out-95 data-[state=open]:tc-zoom-in-95 data-[side=bottom]:tc-slide-in-from-top-2 data-[side=left]:tc-slide-in-from-right-2 data-[side=right]:tc-slide-in-from-left-2 data-[side=top]:tc-slide-in-from-bottom-2',
                     className
                 )}
                 {...props}
             />
         </div>
     </DropdownMenuPrimitive.Portal>
-));
+);
+});
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<

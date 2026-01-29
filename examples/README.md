@@ -4,7 +4,7 @@ This directory contains standalone example applications demonstrating how to use
 
 ## Examples
 
-### 1. [Basic Wallet Connect](./basic-wallet-connect)
+### 1. [Basic Wallet Connect](./basic-app)
 
 The simplest possible example - connect a wallet and display the connected address.
 
@@ -16,7 +16,7 @@ The simplest possible example - connect a wallet and display the connected addre
 
 **Run it:**
 ```bash
-cd basic-wallet-connect
+cd basic-app
 npm install
 npm run dev
 ```
@@ -41,7 +41,7 @@ For any example:
 
 2. **Navigate to the example**:
    ```bash
-   cd examples/basic-wallet-connect
+   cd examples/basic-app
    ```
 
 3. **Install dependencies**:

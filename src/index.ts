@@ -14,6 +14,7 @@ export { default as ConnectWalletButton } from '@/components/ConnectWallet/Conne
 export { default as ConnectWalletWrapper } from '@/components/ConnectWallet/ConnectWalletWrapper';
 export { default as ConnectModal } from '@/components/ConnectWallet/ConnectModal';
 export { default as WalletSettingsModal } from '@/components/ConnectWallet/WalletSettingsModal';
+export { default as TenConnectButton } from '@/components/ConnectWallet/TenConnectButton';
 
 // Session Key Manager Components
 export { default as SessionKeyManager } from '@/components/SessionKeyManager/SessionKeyManager';
@@ -25,9 +26,15 @@ export { default as SessionKeyTrashProgress } from '@/components/SessionKeyManag
 // Stores
 export { useSessionKeyStore } from '@/stores/sessionKey.store';
 export { useSessionKeyManagerStore, DeletionState } from '@/stores/sessionKeyManager.store';
+export { useUIStore } from '@/stores/ui.store';
+export { useThemeStore } from '@/stores/theme.store';
+export type { ThemeMode, ResolvedTheme } from '@/stores/theme.store';
 
 // Hooks
 export { useSessionKey } from '@/hooks/useSessionKey';
+export { useConnectModal } from '@/hooks/useConnectModal';
+export { useTheme } from '@/hooks/useTheme';
+export type { UseThemeReturn } from '@/hooks/useTheme';
 
 // Contract methods
 export { CreatePublicClients } from '@/lib/contractReadFunctions'

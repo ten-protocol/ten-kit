@@ -147,9 +147,9 @@ export default function WalletSettingsModal({
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Wallet Settings</DialogTitle>
+                    <DialogTitle>Connection Info</DialogTitle>
                     <DialogDescription>
-                        Manage your wallet connection and network settings
+                        View and manage your wallet connection.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="tc-space-y-4">

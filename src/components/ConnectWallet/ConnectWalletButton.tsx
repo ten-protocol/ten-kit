@@ -2,9 +2,11 @@ import { Button } from '@/components/ui/button';
 import { DEFAULT_GATEWAY_URL, TEN_CHAIN_ID } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useAccount, useBalance } from 'wagmi';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ConnectModal from './ConnectModal';
 import WalletSettingsModal from './WalletSettingsModal';
+import { useUIStore } from '@/stores/ui.store';
+import { useThemeStore } from '@/stores/theme.store';
 
 import { Loader2 } from 'lucide-react';
 
@@ -24,8 +26,13 @@ export default function ConnectWalletButton({
     onTrackEvent
 }: CustomConnectButtonProps) {
     const { address, isConnected, chain } = useAccount();
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+    const {
+        isConnectModalOpen,
+        isSettingsModalOpen,
+        setConnectModalOpen,
+        setSettingsModalOpen,
+    } = useUIStore();
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
 
     const isWrongChain = !chain || Number(chain.id) !== Number(TEN_CHAIN_ID);
 
@@ -53,11 +60,11 @@ export default function ConnectWalletButton({
     }, [chain, isWrongChain, onChainChange]);
 
     return (
-        <div className="ten-connect">
+        <div className={cn('ten-connect', resolvedTheme === 'dark' && 'dark')}>
             {!isConnected ? (
                 <>
                     <Button
-                        onClick={() => setIsConnectModalOpen(true)}
+                        onClick={() => setConnectModalOpen(true)}
                         className={cn('tc-bg-primary hover:tc-bg-primary/80', className)}
                         style={style}
                     >
@@ -65,7 +72,7 @@ export default function ConnectWalletButton({
                     </Button>
                     <ConnectModal
                         isOpen={isConnectModalOpen}
-                        onOpenChange={setIsConnectModalOpen}
+                        onOpenChange={setConnectModalOpen}
                         gatewayUrl={gatewayUrl}
                     />
                 </>
@@ -75,7 +82,7 @@ export default function ConnectWalletButton({
                             <Button
                                 size="sm"
                                 className="tc-bg-destructive hover:tc-bg-destructive/90"
-                                onClick={() => setIsSettingsOpen(true)}
+                                onClick={() => setSettingsModalOpen(true)}
                             >
                                 SWITCH CHAIN
                             </Button>
@@ -83,7 +90,7 @@ export default function ConnectWalletButton({
                         <Button
                             className={cn('tc-bg-primary hover:tc-bg-primary/90 tc-flex tc-flex-col tc-items-center tc-justify-center lg:tc-py-2 tc-gap-0', className)}
                             style={style}
-                            onClick={() => setIsSettingsOpen(true)}
+                            onClick={() => setSettingsModalOpen(true)}
                         >
                             <span className="tc-text-xs">
                                 {address?.slice(0, 6)}...{address?.slice(-4)}
@@ -101,8 +108,8 @@ export default function ConnectWalletButton({
                         </Button>
                     )}
                     <WalletSettingsModal
-                        isOpen={isSettingsOpen}
-                        onOpenChange={setIsSettingsOpen}
+                        isOpen={isSettingsModalOpen}
+                        onOpenChange={setSettingsModalOpen}
                         gatewayUrl={gatewayUrl}
                     />
                 </>

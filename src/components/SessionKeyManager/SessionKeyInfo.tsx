@@ -65,9 +65,9 @@ export default function SessionKeyInfo() {
     }
 
     return (
-        <Card className="tc-bg-white/5">
+        <Card className="tc-bg-muted tc-border-none">
             <CardHeader className="tc-flex-row tc-justify-between tc-relative">
-                <CardTitle className="tc-text-lg">Session Key Info</CardTitle>
+                <CardTitle className="tc-font-normal tc-opacity-80">Session Key Info</CardTitle>
                 {/* Troubleshooting */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "npx hardhat compile && vite",
+    "build": "npx hardhat compile && tsc && vite build",
+    "preview": "npx hardhat compile && vite preview"
   },
   "dependencies": {
     "@tenprotocol/ten-kit": "file:../..",
@@ -18,10 +18,12 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
+    "hardhat": "^2.26.3",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3",

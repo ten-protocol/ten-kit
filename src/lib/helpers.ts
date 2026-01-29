@@ -25,9 +25,14 @@ export async function getLatestBlockNumber(): Promise<string | null> {
 }
 
 export function toRlpHex(value: bigint | number): string {
+    // For RLP encoding: zero MUST be encoded as empty bytes, not '0' or '00'
+    if (value === 0 || value === 0n) {
+        return ''; // Empty string for zero in RLP
+    }
     const hex = toHex(value);
-    // Remove 0x prefix for RLP encoding
-    return hex.slice(2);
+    // Remove 0x prefix and any leading zeros for proper RLP encoding
+    const stripped = hex.slice(2).replace(/^0+/, '');
+    return stripped || ''; // Return empty string if all zeros
 }
 
 export async function checkTenNetwork(provider: EIP1193Provider): Promise<void> {
